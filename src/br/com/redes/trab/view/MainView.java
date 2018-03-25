@@ -3,15 +3,19 @@ package br.com.redes.trab.view;
 import br.com.redes.trab.p2p.Server;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JTextArea;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  *
  * @author RenatoYuzo
  */
 public class MainView extends javax.swing.JFrame {
+    
+    ServerSocket serverSocket;
+    Server newServer;
+    Socket client;
 
     /**
      * Creates new form MainView
@@ -124,11 +128,7 @@ public class MainView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
-        try {
-            new Server(Integer.parseInt(tfPort.getText()), tfIP.getText(), textArea, textError);
-        } catch (IOException e) {
-            textError.add("Erro: " + e.getMessage());
-        }
+        openMainServer();
     }//GEN-LAST:event_btnServerActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -164,9 +164,10 @@ public class MainView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 MainView main = new MainView();
-                main.setVisible(true);                
+                main.setVisible(true);
             }
         });
     }
@@ -183,19 +184,50 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JTextField tfIP;
     private javax.swing.JTextField tfPort;
     // End of variables declaration//GEN-END:variables
-    
-    public void getFiles() {
-        File directory = new File("D:\\Desktop\\Shared Files");
-        File[] listOfFiles = directory.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                listFiles.add(listOfFiles[i].getName());
+    public void getFiles() {
+        
+        try {
+            File directory = new File("D:\\Desktop\\Shared Files");
+            File[] listOfFiles = directory.listFiles();
+            
+            for (File listOfFile : listOfFiles) {
+                if (listOfFile.isFile()) {
+                    listFiles.add(listOfFile.getName());
+                }
             }
+        } catch (Exception e) {
+            textError.add("Error: " + e.getMessage());
         }
+        
     }
     
-    /*public void createServer() {
-        Server server = new Server(textArea, textError);
-    }*/
+    public void openMainServer() {
+        
+        try {
+            serverSocket = new ServerSocket();
+            serverSocket.bind(new InetSocketAddress(tfIP.getText(), Integer.parseInt(tfPort.getText())));
+            
+            textArea.add("Server port: " + serverSocket.getLocalPort());
+            textArea.add("Server HostAddress = " + serverSocket.getInetAddress().getHostAddress());
+            textArea.add("Server HostName = " + serverSocket.getInetAddress().getHostName());
+            
+            while (true) {
+                textArea.add("Server waiting for Client . . .");
+                client = serverSocket.accept();
+                
+                textArea.add("Server connected with Client " + client.getPort());
+                textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
+                textArea.add("Client HostName = " + client.getInetAddress().getHostName());
+                
+                newServer = new Server(client, textArea, textError);
+                Thread thread = new Thread(newServer);
+                thread.start();
+            }
+            
+        } catch (IOException ex) {
+            textError.add("Error: " + ex.getMessage());
+        }
+        
+    }
 }
