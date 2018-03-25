@@ -212,8 +212,8 @@ public class MainView extends javax.swing.JFrame {
             textArea.add("Server HostAddress = " + serverSocket.getInetAddress().getHostAddress());
             textArea.add("Server HostName = " + serverSocket.getInetAddress().getHostName());
             
-            while (true) {
-                textArea.add("Server waiting for Client . . .");
+            textArea.add("Server waiting for Client . . .");
+            while (true) {                
                 client = serverSocket.accept();
                 
                 textArea.add("Server connected with Client " + client.getPort());
