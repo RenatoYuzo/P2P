@@ -221,7 +221,7 @@ public class MainView extends javax.swing.JFrame {
                 textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
                 textArea.add("Client HostName = " + client.getInetAddress().getHostName());
                 
-                newServer = new Server(client, textArea, textError);
+                newServer = new Server(serverSocket, client, textArea, textError, listFiles);
                 Thread thread = new Thread(newServer);
                 thread.start();
             }
