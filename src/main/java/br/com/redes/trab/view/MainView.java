@@ -1,21 +1,29 @@
 package br.com.redes.trab.view;
 
+import br.com.redes.trab.p2p.Client;
 import br.com.redes.trab.p2p.Server;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
  * @author RenatoYuzo
  */
 public class MainView extends javax.swing.JFrame {
-    
+
     ServerSocket serverSocket;
     Server newServer;
     Socket client;
+    Client myClient;
 
     /**
      * Creates new form MainView
@@ -34,7 +42,7 @@ public class MainView extends javax.swing.JFrame {
     private void initComponents() {
 
         listFiles = new java.awt.List();
-        jTextField1 = new javax.swing.JTextField();
+        tfCommand = new javax.swing.JTextField();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
         tfPort = new javax.swing.JTextField();
@@ -45,13 +53,15 @@ public class MainView extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("P2P");
 
-        btnServer.setText("Server");
-        btnServer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnServerActionPerformed(evt);
+        tfCommand.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tfCommandKeyReleased(evt);
             }
         });
+
+        btnServer.setText("Server");
 
         tfIP.setText("localhost");
 
@@ -66,11 +76,6 @@ public class MainView extends javax.swing.JFrame {
         textError.setBackground(new java.awt.Color(255, 204, 204));
 
         jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -81,7 +86,7 @@ public class MainView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(textArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(listFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTextField1)
+                    .addComponent(tfCommand)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -96,13 +101,13 @@ public class MainView extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE))
                     .addComponent(textError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tfCommand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -125,15 +130,26 @@ public class MainView extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
-        openMainServer();
-    }//GEN-LAST:event_btnServerActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        getFiles();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void tfCommandKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfCommandKeyReleased
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            
+            if (tfCommand.getText().equals("File List")) {
+                JOptionPane.showMessageDialog(null, "Getting files from others.");
+            }
+            else if (tfCommand.getText().equals("My Files")) {
+                getFiles();
+            }            
+            else {
+                JOptionPane.showMessageDialog(null, "Command not supported.");
+            }
+            /*myClient = new Client(textArea, textError, listFiles);
+            Thread threadClient = new Thread(myClient);
+            threadClient.start();*/
+        }
+    }//GEN-LAST:event_tfCommandKeyReleased
 
     /**
      * @param args the command line arguments
@@ -167,31 +183,44 @@ public class MainView extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                try {
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (UnsupportedLookAndFeelException ex) {
+                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 MainView main = new MainView();
                 main.setVisible(true);
+                main.openServer();
             }
         });
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnServer;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextField jTextField1;
     private java.awt.List listFiles;
     private java.awt.List textArea;
     private java.awt.List textError;
+    private javax.swing.JTextField tfCommand;
     private javax.swing.JTextField tfIP;
     private javax.swing.JTextField tfPort;
     // End of variables declaration//GEN-END:variables
 
     public void getFiles() {
-        
+
         try {
             File directory = new File("D:\\Desktop\\Shared Files");
             File[] listOfFiles = directory.listFiles();
-            
+
             for (File listOfFile : listOfFiles) {
                 if (listOfFile.isFile()) {
                     listFiles.add(listOfFile.getName());
@@ -200,35 +229,45 @@ public class MainView extends javax.swing.JFrame {
         } catch (Exception e) {
             textError.add("Error: " + e.getMessage());
         }
-        
+
     }
-    
-    public void openMainServer() {
-        
-        try {
-            serverSocket = new ServerSocket();
-            serverSocket.bind(new InetSocketAddress(tfIP.getText(), Integer.parseInt(tfPort.getText())));
-            
-            textArea.add("Server port: " + serverSocket.getLocalPort());
-            textArea.add("Server HostAddress = " + serverSocket.getInetAddress().getHostAddress());
-            textArea.add("Server HostName = " + serverSocket.getInetAddress().getHostName());
-            
-            textArea.add("Server waiting for Client . . .");
-            while (true) {                
-                client = serverSocket.accept();
-                
-                textArea.add("Server connected with Client " + client.getPort());
-                textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
-                textArea.add("Client HostName = " + client.getInetAddress().getHostName());
-                
-                newServer = new Server(serverSocket, client, textArea, textError, listFiles);
-                Thread thread = new Thread(newServer);
-                thread.start();
+
+    public void openServer() {
+        Thread myServer = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    serverSocket = new ServerSocket();
+                    serverSocket.bind(new InetSocketAddress(tfIP.getText(), Integer.parseInt(tfPort.getText())));
+
+                    textArea.add("Server port: " + serverSocket.getLocalPort());
+                    textArea.add("Server HostAddress = " + serverSocket.getInetAddress().getHostAddress());
+                    textArea.add("Server HostName = " + serverSocket.getInetAddress().getHostName());
+
+                    while (true) {
+                        textArea.add("====== Main Server waiting for Client ======");
+                        client = serverSocket.accept();
+
+                        textArea.add("Server connected with Client " + client.getPort());
+                        textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
+                        textArea.add("Client HostName = " + client.getInetAddress().getHostName());
+
+                        newServer = new Server(serverSocket, client, textArea, textError, listFiles);
+                        Thread threadServer = new Thread(newServer);
+                        threadServer.start();
+                    }
+
+                } catch (IOException ex) {
+                    textError.add("Error: " + ex.getMessage());
+                }
             }
-            
-        } catch (IOException ex) {
-            textError.add("Error: " + ex.getMessage());
-        }
-        
+        });
+        myServer.start();
+    }
+
+    public void openClient() {
+        myClient = new Client(textArea, textError, listFiles);
+        Thread threadClient = new Thread(myClient);
+        threadClient.start();
     }
 }

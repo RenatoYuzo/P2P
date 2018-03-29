@@ -33,7 +33,7 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        textArea.add("New connection with Client " + client.getInetAddress().getHostAddress());
+        textArea.add("New connection with Client " + client.getPort()+ " " +client.getInetAddress().getHostAddress());
 
         try {
             PrintWriter out = new PrintWriter(client.getOutputStream(), true);
