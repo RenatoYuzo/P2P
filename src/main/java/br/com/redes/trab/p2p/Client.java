@@ -1,6 +1,7 @@
 package br.com.redes.trab.p2p;
 
 import java.awt.List;
+import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -10,6 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  *
@@ -20,11 +23,13 @@ public class Client implements Runnable {
     private final List textArea;
     private final List textError;
     private final List listFiles;
+    private final String fileName;
     private PrintWriter out1;
     private BufferedReader input1;
     private final String path="D:\\Desktop\\Received Files from Server";
 
-    public Client(List textArea, List textError, List listFiles) {
+    public Client(List textArea, List textError, List listFiles, String fileName) {
+        this.fileName = fileName;
         this.textArea = textArea;
         this.textError = textError;
         this.listFiles = listFiles;
@@ -34,6 +39,7 @@ public class Client implements Runnable {
     public void run() {
         getFiles();
     }
+    
 
     public void getFiles() {
 
@@ -42,19 +48,19 @@ public class Client implements Runnable {
             BufferedReader reader = new BufferedReader(in);
 
             String ipAddress = "";
-            String fileName = "";
 
-            System.out.print("Please enter a valid Server Ip address: ");
-            ipAddress = reader.readLine();
+            //System.out.print("Please enter a valid Server Ip address: ");
+            //ipAddress = reader.readLine();
+            ipAddress = "localhost";
 
             Socket socket = new Socket(ipAddress, 5555);
             
             out1 = new PrintWriter(socket.getOutputStream(), true);
             input1 = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            out1.println(reader.readLine());
+            out1.println("Download File");
             System.out.println(input1.readLine());
-            fileName = reader.readLine();
+            //fileName = reader.readLine();
             out1.println(fileName);
             
             InputStream inputByte = socket.getInputStream();
@@ -62,8 +68,6 @@ public class Client implements Runnable {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             //send desired filename
-            //out.println(fileName);
-            //outputFile.write(new String("catalin").getBytes());
             int code = input.read();
             System.out.println("code:" + code);
             if (code == 1) {
@@ -76,13 +80,15 @@ public class Client implements Runnable {
                     outputFile.flush();
                 }
                 System.out.println();
-                System.out.println("File: " + fileName + " was successfully downloaded!");
+                JOptionPane.showMessageDialog(null, "File: " + fileName + " was successfully downloaded!");
+                //System.out.println("File: " + fileName + " was successfully downloaded!");
             } else {
-                System.out.println("File is not present on the server!");
+                JOptionPane.showMessageDialog(null, "File is not present on the server.");
+                //System.out.println("File is not present on the server!");
             }
 
         } catch (Exception e) {
-            System.out.println(e.toString());
+            textError.add(e.getMessage());
         }
 
     }
