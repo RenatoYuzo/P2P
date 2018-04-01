@@ -51,9 +51,11 @@ public class Server implements Runnable {
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             clientMsg = in.readLine();
 
-            if (clientMsg.equals("Files")) {
+            if (clientMsg.equals("Get Available Files")) {
                 getFiles();
-            } else if (clientMsg.equals("Download File")) {
+                closeConnection();
+            } 
+            else if (clientMsg.equals("Download File")) {
                 serverMsg = "Which file do you want to download?";
                 out.println(serverMsg);
 

@@ -154,7 +154,7 @@ public class MainView extends javax.swing.JFrame {
             switch (tfCommand.getText()) {
                 case "Download File":
                     tfCommand.setText("");
-                    openClient();
+                    //openClient();
                     break;
                 case "My Files":
                     tfCommand.setText("");
@@ -170,13 +170,12 @@ public class MainView extends javax.swing.JFrame {
 
     private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
         if (cbCommand.getSelectedIndex() == 0) {
-            getFiles();
+            openClient(cbCommand.getSelectedItem().toString(), null);
         }
         else if (cbCommand.getSelectedIndex() == 1) {
-            
-            if (getSelectedFile()!=null) {
-                fileName = getSelectedFile();
-                openClient();
+            fileName = getSelectedFile();
+            if (fileName!=null) {
+                openClient(cbCommand.getSelectedItem().toString(), fileName);
             }
             else {
                 JOptionPane.showMessageDialog(null, "Select one file to download.");
@@ -245,10 +244,13 @@ public class MainView extends javax.swing.JFrame {
     }
     
     public String getSelectedFile() {
-        
+            String[] separated;
+            
             for (int i=0; i<listFiles.getItemCount(); i++) {
                 if (listFiles.isIndexSelected(i)) {
-                    return listFiles.getItem(i);
+                    separated = listFiles.getItem(i).split(" ");
+                    System.out.println("separated: "+separated[1]);
+                    return separated[1];
                 }
             }
             return null;
@@ -288,8 +290,8 @@ public class MainView extends javax.swing.JFrame {
         myServer.start();
     }
 
-    public void openClient() {
-        myClient = new Client(textArea, textError, listFiles, fileName);
+    public void openClient(String command, String fileName) {
+        myClient = new Client(textArea, textError, listFiles, command, fileName);
         Thread threadClient = new Thread(myClient);
         threadClient.start();
     }
