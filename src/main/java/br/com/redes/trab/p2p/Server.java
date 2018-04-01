@@ -2,8 +2,11 @@ package br.com.redes.trab.p2p;
 
 import java.net.Socket;
 import java.awt.List;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -22,6 +25,11 @@ public class Server implements Runnable {
     private final List listFiles;
     private String serverMsg;
     private String clientMsg;
+    private final String path = "D:\\Desktop\\Shared Files";
+    private PrintWriter out;
+    private BufferedReader in;
+    private BufferedInputStream fileReader;
+    private BufferedOutputStream outByte;
 
     public Server(ServerSocket serverSocket, Socket client, List textArea, List textError, List listFiles) {
         this.serverSocket = serverSocket;
@@ -33,46 +41,73 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        textArea.add("New connection with Client " + client.getPort()+ " " +client.getInetAddress().getHostAddress());
+        textArea.add("New connection with Client " + client.getPort() + " " + client.getInetAddress().getHostAddress());
 
         try {
-            PrintWriter out = new PrintWriter(client.getOutputStream(), true);
-            serverMsg = "Hello from Server!";
-            out.println(serverMsg);
+            out = new PrintWriter(client.getOutputStream(), true);
+            //serverMsg = "Hello from Server!";
+            //out.println(serverMsg);
 
-            BufferedReader input = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            clientMsg = input.readLine();
+            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            clientMsg = in.readLine();
 
             if (clientMsg.equals("Files")) {
                 getFiles();
             } else if (clientMsg.equals("Download File")) {
                 serverMsg = "Which file do you want to download?";
                 out.println(serverMsg);
-                clientMsg = input.readLine();
+
+                clientMsg = in.readLine();
+                File file = new File(path + "\\" + clientMsg);
+                outByte = new BufferedOutputStream(client.getOutputStream());
+
+                if (!file.exists()) {
+                    outByte.write((byte) 0);
+                    closeConnection();
+                } else {
+                    outByte.write((byte) 1);
+                    fileReader = new BufferedInputStream(new FileInputStream(file));
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = 0;
+                    while ((bytesRead = fileReader.read(buffer)) != -1) {
+                        outByte.write(buffer, 0, bytesRead);
+                        outByte.flush();
+                    }
+
+                    closeConnection();
+                }
+
                 serverMsg = "File " + clientMsg + " has been successfully downloaded.";
                 out.println(serverMsg);
             } else if (clientMsg.equals("Exit")) {
                 serverMsg = "Ok, Bye!";
                 out.println(serverMsg);
-                input.close();
+                closeConnection();
+            }
+
+        } catch (IOException e) {
+            textError.add("Error: " + e.getMessage());
+        }
+    }
+
+    public void closeConnection() {
+        try {
+            if (client != null) {
                 client.close();
-                textArea.add("Client " + client.getPort() + " has disconnected");
             }
-
-            input.close();
-            client.close();
-
-            /*while (!clientMsg.equals("Exit")) {
-
-                serverMsg = "Say something.";
-                out.println(serverMsg);
-
-                clientMsg = input.readLine();
-
-                System.out.println("Client " + client.getPort() + " said: " + clientMsg);
+            if (out != null) {
+                out.close();
             }
-            serverMsg = "Ok, Bye!";
-            out.println(serverMsg);*/
+            if (in != null) {
+                in.close();
+            }
+            if (fileReader != null) {
+                fileReader.close();
+            }
+            if (outByte != null) {
+                outByte.close();
+            }
+            textArea.add("Client " + client.getPort() + " has disconnected");
         } catch (IOException e) {
             textError.add("Error: " + e.getMessage());
         }
@@ -81,8 +116,8 @@ public class Server implements Runnable {
     public void getFiles() {
 
         try {
-            File directory = new File("D:\\Desktop\\Shared Files");
-            File[] listOfFiles = directory.listFiles();
+            File file = new File(path);
+            File[] listOfFiles = file.listFiles();
 
             for (File listOfFile : listOfFiles) {
                 if (listOfFile.isFile()) {

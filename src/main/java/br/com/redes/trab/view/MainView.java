@@ -197,6 +197,7 @@ public class MainView extends javax.swing.JFrame {
                 MainView main = new MainView();
                 main.setVisible(true);
                 main.openServer();
+                main.openClient();
             }
         });
     }
