@@ -57,6 +57,14 @@ public class Client implements Runnable {
 
             if (command.equals("Get Available Files")) {
                 out1.println(command); //First command
+                
+                String numFiles = input1.readLine(); // Pegando a quantidade de arquivos fornecido pelo Server
+                //System.out.println("numFiles: "+numFiles);
+                
+                for(int i=0; i<Integer.parseInt(numFiles); i++) {
+                    listFiles.add(input1.readLine()); 
+                }
+                
                 //input1.readLine(); PEGAR A LISTA DE ARQUIVOS QUE O SERVIDOR FORNECER
             } 
             else if (command.equals("Download File")) {

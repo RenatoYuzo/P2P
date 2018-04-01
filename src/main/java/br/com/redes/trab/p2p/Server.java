@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 
 /**
  *
@@ -52,7 +53,16 @@ public class Server implements Runnable {
             clientMsg = in.readLine();
 
             if (clientMsg.equals("Get Available Files")) {
-                getFiles();
+                ArrayList<String> list;
+                list = getFiles();
+                
+                out.println(Integer.toString(list.size())); // Enviando a quantidade de arquivos para o Client
+                
+                for (int i=0; i<list.size(); i++) {
+                    //System.out.println("list["+i+"]: " + list.get(i));
+                    out.println(list.get(i));
+                }
+                
                 closeConnection();
             } 
             else if (clientMsg.equals("Download File")) {
@@ -115,20 +125,27 @@ public class Server implements Runnable {
         }
     }
 
-    public void getFiles() {
+    public ArrayList<String> getFiles() {
 
         try {
             File file = new File(path);
             File[] listOfFiles = file.listFiles();
+            ArrayList<String> listOfNameFiles = new ArrayList();
 
             for (File listOfFile : listOfFiles) {
                 if (listOfFile.isFile()) {
+                    listOfNameFiles.add(serverSocket.getInetAddress().getHostAddress() + " " + listOfFile.getName());
+                }                
+                
+                /*if (listOfFile.isFile()) {
                     listFiles.add(serverSocket.getInetAddress().getHostAddress() + " " + listOfFile.getName());
-                }
+                }*/
             }
+            return listOfNameFiles;
         } catch (Exception e) {
             textError.add("Error: " + e.getMessage());
         }
+        return null;
 
     }
 

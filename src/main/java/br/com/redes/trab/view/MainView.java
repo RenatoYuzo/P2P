@@ -249,7 +249,8 @@ public class MainView extends javax.swing.JFrame {
             for (int i=0; i<listFiles.getItemCount(); i++) {
                 if (listFiles.isIndexSelected(i)) {
                     separated = listFiles.getItem(i).split(" ");
-                    System.out.println("separated: "+separated[1]);
+                    //System.out.println("separated 0: "+separated[0]);
+                    //System.out.println("separated 1: "+separated[1]);
                     return separated[1];
                 }
             }
