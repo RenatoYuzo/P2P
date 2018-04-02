@@ -1,18 +1,15 @@
 package br.com.redes.trab.p2p;
 
 import java.awt.List;
-import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 /**
  *
@@ -23,13 +20,18 @@ public class Client implements Runnable {
     private final List textArea;
     private final List textError;
     private final List listFiles;
+    private final int port;
+    private String ipAddress;
     private final String fileName;
     private final String command;
     private PrintWriter out1;
     private BufferedReader input1;
-    private final String path = "D:\\Desktop\\Received Files from Server";
+    //private final String path = "D:\\Desktop\\Received Files from Server";
+    private final String path;
 
-    public Client(List textArea, List textError, List listFiles, String command, String fileName) {
+    public Client(int port, List textArea, List textError, List listFiles, String path, String command, String fileName) {
+        this.port = port;
+        this.path = path;
         this.command = command;
         this.fileName = fileName;
         this.textArea = textArea;
@@ -44,30 +46,34 @@ public class Client implements Runnable {
             InputStreamReader in = new InputStreamReader(System.in);
             BufferedReader reader = new BufferedReader(in);
 
-            String ipAddress = "";
-
-            //System.out.print("Please enter a valid Server Ip address: ");
-            //ipAddress = reader.readLine();
-            ipAddress = "localhost";
-
-            Socket socket = new Socket(ipAddress, 5555);
-
-            out1 = new PrintWriter(socket.getOutputStream(), true);
-            input1 = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
             if (command.equals("Get Available Files")) {
+                ipAddress = "localhost";
+
+                Socket socket = new Socket(ipAddress, port);
+
+                out1 = new PrintWriter(socket.getOutputStream(), true);
+                input1 = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
                 out1.println(command); //First command
-                
+
                 String numFiles = input1.readLine(); // Pegando a quantidade de arquivos fornecido pelo Server
                 //System.out.println("numFiles: "+numFiles);
-                
-                for(int i=0; i<Integer.parseInt(numFiles); i++) {
-                    listFiles.add(input1.readLine()); 
+
+                for (int i = 0; i < Integer.parseInt(numFiles); i++) {
+                    listFiles.add(input1.readLine());
                 }
+            } else if (command.equals("Download File")) {
                 
-                //input1.readLine(); PEGAR A LISTA DE ARQUIVOS QUE O SERVIDOR FORNECER
-            } 
-            else if (command.equals("Download File")) {
+                System.out.println(listFiles.getSelectedItem().toString());
+                String[] split = listFiles.getSelectedItem().split(" ");
+                
+                ipAddress = split[0];
+                
+                Socket socket = new Socket(ipAddress, port);
+
+                out1 = new PrintWriter(socket.getOutputStream(), true);
+                input1 = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                
                 out1.println(command); //First command
 
                 //System.out.println(input1.readLine()); // Witch file do you want to download?

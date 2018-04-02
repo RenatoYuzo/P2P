@@ -26,18 +26,20 @@ public class Server implements Runnable {
     private final List listFiles;
     private String serverMsg;
     private String clientMsg;
-    private final String path = "D:\\Desktop\\Shared Files";
+    //private final String path = "D:\\Desktop\\Shared Files";
+    private final String path;
     private PrintWriter out;
     private BufferedReader in;
     private BufferedInputStream fileReader;
     private BufferedOutputStream outByte;
 
-    public Server(ServerSocket serverSocket, Socket client, List textArea, List textError, List listFiles) {
+    public Server(ServerSocket serverSocket, Socket client, List textArea, List textError, List listFiles, String path) {
         this.serverSocket = serverSocket;
         this.client = client;
         this.textArea = textArea;
         this.textError = textError;
         this.listFiles = listFiles;
+        this.path = path;
     }
 
     @Override

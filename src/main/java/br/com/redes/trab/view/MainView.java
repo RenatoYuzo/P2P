@@ -2,14 +2,13 @@ package br.com.redes.trab.view;
 
 import br.com.redes.trab.p2p.Client;
 import br.com.redes.trab.p2p.Server;
-import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -43,7 +42,6 @@ public class MainView extends javax.swing.JFrame {
     private void initComponents() {
 
         listFiles = new java.awt.List();
-        tfCommand = new javax.swing.JTextField();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
         tfPort = new javax.swing.JTextField();
@@ -53,18 +51,24 @@ public class MainView extends javax.swing.JFrame {
         textError = new java.awt.List();
         btnClient = new javax.swing.JButton();
         cbCommand = new javax.swing.JComboBox<>();
+        list1 = new java.awt.List();
+        tfSrcFolder = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        tfDestFolder = new javax.swing.JTextField();
+        btnChooseFileSrcFolder = new javax.swing.JButton();
+        btnChooseFileDestFolder = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("P2P");
         setResizable(false);
 
-        tfCommand.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tfCommandKeyReleased(evt);
+        btnServer.setText("Server");
+        btnServer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnServerActionPerformed(evt);
             }
         });
-
-        btnServer.setText("Server");
 
         tfIP.setText("localhost");
 
@@ -85,7 +89,31 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Get Available Files", "Download File", "Item 3", "Item 4", " " }));
+        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Get Available Files", "Download File" }));
+
+        list1.setBackground(new java.awt.Color(204, 204, 204));
+
+        tfSrcFolder.setText("D:\\Desktop\\Shared Files");
+
+        jLabel3.setText("Source Folder:");
+
+        jLabel4.setText("Dest. Folder:");
+
+        tfDestFolder.setText("D:\\Desktop\\Received Files from Server");
+
+        btnChooseFileSrcFolder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_icon.png"))); // NOI18N
+        btnChooseFileSrcFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChooseFileSrcFolderActionPerformed(evt);
+            }
+        });
+
+        btnChooseFileDestFolder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_icon.png"))); // NOI18N
+        btnChooseFileDestFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChooseFileDestFolderActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -94,95 +122,138 @@ public class MainView extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(textArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(listFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tfCommand)
                     .addComponent(textError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnServer, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(textArea, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tfIP, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(261, 261, 261))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(cbCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(tfPort, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(tfIP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(tfSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(1, 1, 1))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(163, 163, 163)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClient, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(list1, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+                            .addComponent(btnClient, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cbCommand, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnChooseFileDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbCommand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnClient))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(tfCommand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(tfIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cbCommand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(tfSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3)
+                            .addComponent(tfDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4)
+                            .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnChooseFileDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(btnClient)
+                    .addComponent(btnServer))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnServer)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(textArea, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(list1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textArea, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(textError, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textError, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(listFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(listFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13))
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tfCommandKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfCommandKeyReleased
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-
-            switch (tfCommand.getText()) {
-                case "Download File":
-                    tfCommand.setText("");
-                    //openClient();
-                    break;
-                case "My Files":
-                    tfCommand.setText("");
-                    getFiles();
-                    break;
-                default:
-                    JOptionPane.showMessageDialog(null, "Command not supported.");
-                    break;
-            }
-
-        }
-    }//GEN-LAST:event_tfCommandKeyReleased
-
     private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
         if (cbCommand.getSelectedIndex() == 0) {
             openClient(cbCommand.getSelectedItem().toString(), null);
-        }
-        else if (cbCommand.getSelectedIndex() == 1) {
+        } else if (cbCommand.getSelectedIndex() == 1) {
             fileName = getSelectedFile();
-            if (fileName!=null) {
+            if (fileName != null) {
                 openClient(cbCommand.getSelectedItem().toString(), fileName);
-            }
-            else {
+            } else {
                 JOptionPane.showMessageDialog(null, "Select one file to download.");
             }
         }
-        
+
     }//GEN-LAST:event_btnClientActionPerformed
+
+    private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
+        tfIP.setEnabled(false);
+        tfPort.setEnabled(false);
+        tfSrcFolder.setEnabled(false);
+        btnChooseFileSrcFolder.setEnabled(false);
+        openServer();
+    }//GEN-LAST:event_btnServerActionPerformed
+
+    private void btnChooseFileSrcFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileSrcFolderActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setDialogTitle("Choose Server source folder");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            //System.out.println("getCurrentDirectory(): " + fileChooser.getCurrentDirectory());
+            tfSrcFolder.setText(fileChooser.getSelectedFile().getPath());
+            //System.out.println("getSelectedFile() : " + fileChooser.getSelectedFile());
+        } else {
+            System.out.println("No Selection ");
+        }
+
+
+    }//GEN-LAST:event_btnChooseFileSrcFolderActionPerformed
+
+    private void btnChooseFileDestFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileDestFolderActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setDialogTitle("Choose Client destination folder");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            //System.out.println("getCurrentDirectory(): " + fileChooser.getCurrentDirectory());
+            tfDestFolder.setText(fileChooser.getSelectedFile().getPath());
+            //System.out.println("getSelectedFile() : " + fileChooser.getSelectedFile());
+        } else {
+            System.out.println("No Selection ");
+        }
+    }//GEN-LAST:event_btnChooseFileDestFolderActionPerformed
 
     /**
      * @param args the command line arguments
@@ -206,56 +277,44 @@ public class MainView extends javax.swing.JFrame {
                 }
                 MainView main = new MainView();
                 main.setVisible(true);
-                main.openServer();
+                //main.openServer();
             }
         });
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnChooseFileDestFolder;
+    private javax.swing.JButton btnChooseFileSrcFolder;
     private javax.swing.JButton btnClient;
     private javax.swing.JButton btnServer;
     private javax.swing.JComboBox<String> cbCommand;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private java.awt.List list1;
     private java.awt.List listFiles;
     private java.awt.List textArea;
     private java.awt.List textError;
-    private javax.swing.JTextField tfCommand;
+    private javax.swing.JTextField tfDestFolder;
     private javax.swing.JTextField tfIP;
     private javax.swing.JTextField tfPort;
+    private javax.swing.JTextField tfSrcFolder;
     // End of variables declaration//GEN-END:variables
 
-    public void getFiles() {
-
-        try {
-            File directory = new File("D:\\Desktop\\Shared Files");
-            File[] listOfFiles = directory.listFiles();
-
-            for (File listOfFile : listOfFiles) {
-                if (listOfFile.isFile()) {
-                    listFiles.add(listOfFile.getName());
-                }
-            }
-        } catch (Exception e) {
-            textError.add("Error: " + e.getMessage());
-        }
-
-    }
-    
     public String getSelectedFile() {
-            String[] separated;
-            
-            for (int i=0; i<listFiles.getItemCount(); i++) {
-                if (listFiles.isIndexSelected(i)) {
-                    separated = listFiles.getItem(i).split(" ");
-                    //System.out.println("separated 0: "+separated[0]);
-                    //System.out.println("separated 1: "+separated[1]);
-                    return separated[1];
-                }
+        String[] separated;
+
+        for (int i = 0; i < listFiles.getItemCount(); i++) {
+            if (listFiles.isIndexSelected(i)) {
+                separated = listFiles.getItem(i).split(" ");
+                //System.out.println("separated 0: "+separated[0]);
+                //System.out.println("separated 1: "+separated[1]);
+                return separated[1];
             }
-            return null;
-        
+        }
+        return null;
     }
 
     public void openServer() {
@@ -274,11 +333,10 @@ public class MainView extends javax.swing.JFrame {
                         textArea.add("====== Main Server waiting for Client ======");
                         client = serverSocket.accept();
 
-                        textArea.add("Server connected with Client " + client.getPort());
-                        textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
-                        textArea.add("Client HostName = " + client.getInetAddress().getHostName());
-
-                        newServer = new Server(serverSocket, client, textArea, textError, listFiles);
+                        //textArea.add("Server connected with Client " + client.getPort());
+                        //textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
+                        //textArea.add("Client HostName = " + client.getInetAddress().getHostName());
+                        newServer = new Server(serverSocket, client, textArea, textError, listFiles, tfSrcFolder.getText());
                         Thread threadServer = new Thread(newServer);
                         threadServer.start();
                     }
@@ -292,7 +350,7 @@ public class MainView extends javax.swing.JFrame {
     }
 
     public void openClient(String command, String fileName) {
-        myClient = new Client(textArea, textError, listFiles, command, fileName);
+        myClient = new Client(Integer.parseInt(tfPort.getText()), textArea, textError, listFiles, tfDestFolder.getText(), command, fileName);
         Thread threadClient = new Thread(myClient);
         threadClient.start();
     }
