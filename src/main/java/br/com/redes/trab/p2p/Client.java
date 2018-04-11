@@ -64,7 +64,7 @@ public class Client implements Runnable {
                 }
             } else if (command.equals("Download File")) {
                 
-                System.out.println(listFiles.getSelectedItem().toString());
+                System.out.println(listFiles.getSelectedItem());
                 String[] split = listFiles.getSelectedItem().split(" ");
                 
                 ipAddress = split[0];

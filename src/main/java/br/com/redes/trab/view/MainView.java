@@ -1,7 +1,9 @@
 package br.com.redes.trab.view;
 
 import br.com.redes.trab.p2p.Client;
+import br.com.redes.trab.p2p.ClientUDP;
 import br.com.redes.trab.p2p.Server;
+import br.com.redes.trab.p2p.ServerUDP;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -22,7 +24,9 @@ public class MainView extends javax.swing.JFrame {
     ServerSocket serverSocket;
     Server newServer;
     Socket client;
-    Client myClient;
+    Client myClientTCP;
+    ClientUDP myClientUDP;
+    ServerUDP myServerUDP;
     String fileName;
 
     /**
@@ -51,7 +55,7 @@ public class MainView extends javax.swing.JFrame {
         textError = new java.awt.List();
         btnClient = new javax.swing.JButton();
         cbCommand = new javax.swing.JComboBox<>();
-        list1 = new java.awt.List();
+        textAreaClient = new java.awt.List();
         tfSrcFolder = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -89,9 +93,9 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Get Available Files", "Download File" }));
+        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 - Get Available Files", "2 - Download File" }));
 
-        list1.setBackground(new java.awt.Color(204, 204, 204));
+        textAreaClient.setBackground(new java.awt.Color(204, 204, 204));
 
         tfSrcFolder.setText("D:\\Desktop\\Shared Files");
 
@@ -146,7 +150,7 @@ public class MainView extends javax.swing.JFrame {
                                 .addGap(163, 163, 163)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(list1, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+                            .addComponent(textAreaClient, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
                             .addComponent(btnClient, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cbCommand, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
@@ -173,12 +177,13 @@ public class MainView extends javax.swing.JFrame {
                             .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(tfSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3)
-                            .addComponent(tfDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4)
-                            .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(tfSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel3)
+                                .addComponent(tfDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel4))))
                     .addComponent(btnChooseFileDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -187,7 +192,7 @@ public class MainView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(textArea, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(list1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textAreaClient, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textError, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -200,7 +205,11 @@ public class MainView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
-        if (cbCommand.getSelectedIndex() == 0) {
+        
+        String command = Integer.toString(cbCommand.getSelectedIndex()+1);
+        openClientUDP(command);
+        
+        /*if (cbCommand.getSelectedIndex() == 0) {
             openClient(cbCommand.getSelectedItem().toString(), null);
         } else if (cbCommand.getSelectedIndex() == 1) {
             fileName = getSelectedFile();
@@ -209,16 +218,18 @@ public class MainView extends javax.swing.JFrame {
             } else {
                 JOptionPane.showMessageDialog(null, "Select one file to download.");
             }
-        }
-
+        }*/
     }//GEN-LAST:event_btnClientActionPerformed
 
     private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
-        tfIP.setEnabled(false);
+        
+        openServerUDP();
+        
+        /*tfIP.setEnabled(false);
         tfPort.setEnabled(false);
         tfSrcFolder.setEnabled(false);
         btnChooseFileSrcFolder.setEnabled(false);
-        openServer();
+        openServer();*/
     }//GEN-LAST:event_btnServerActionPerformed
 
     private void btnChooseFileSrcFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileSrcFolderActionPerformed
@@ -293,9 +304,9 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private java.awt.List list1;
     private java.awt.List listFiles;
     private java.awt.List textArea;
+    private java.awt.List textAreaClient;
     private java.awt.List textError;
     private javax.swing.JTextField tfDestFolder;
     private javax.swing.JTextField tfIP;
@@ -350,8 +361,20 @@ public class MainView extends javax.swing.JFrame {
     }
 
     public void openClient(String command, String fileName) {
-        myClient = new Client(Integer.parseInt(tfPort.getText()), textArea, textError, listFiles, tfDestFolder.getText(), command, fileName);
-        Thread threadClient = new Thread(myClient);
-        threadClient.start();
+        myClientTCP = new Client(Integer.parseInt(tfPort.getText()), textArea, textError, listFiles, tfDestFolder.getText(), command, fileName);
+        Thread threadClientTCP = new Thread(myClientTCP);
+        threadClientTCP.start();
+    }
+    
+    public void openClientUDP(String command) {
+        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command);
+        Thread threadClientUDP = new Thread(myClientUDP);
+        threadClientUDP.start();
+    }
+    
+    public void openServerUDP() {
+        myServerUDP = new ServerUDP(textArea, textError, listFiles, tfSrcFolder.getText());
+        Thread threadServerUDP = new Thread(myServerUDP);
+        threadServerUDP.start();
     }
 }

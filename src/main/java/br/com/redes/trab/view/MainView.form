@@ -57,7 +57,7 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="list1" pref="383" max="32767" attributes="0"/>
+                          <Component id="textAreaClient" pref="383" max="32767" attributes="0"/>
                           <Component id="btnClient" alignment="0" max="32767" attributes="0"/>
                           <Component id="cbCommand" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
@@ -93,12 +93,14 @@
                           <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="tfSrcFolder" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="tfDestFolder" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btnChooseFileSrcFolder" alignment="0" min="-2" pref="20" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="tfSrcFolder" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="tfDestFolder" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                   <Component id="btnChooseFileDestFolder" min="-2" pref="20" max="-2" attributes="0"/>
@@ -111,7 +113,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="textArea" alignment="0" min="-2" pref="241" max="-2" attributes="0"/>
-                  <Component id="list1" alignment="0" min="-2" pref="241" max="-2" attributes="0"/>
+                  <Component id="textAreaClient" alignment="0" min="-2" pref="241" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="textError" min="-2" pref="25" max="-2" attributes="0"/>
@@ -179,8 +181,8 @@
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="2">
-            <StringItem index="0" value="Get Available Files"/>
-            <StringItem index="1" value="Download File"/>
+            <StringItem index="0" value="1 - Get Available Files"/>
+            <StringItem index="1" value="2 - Download File"/>
           </StringArray>
         </Property>
       </Properties>
@@ -188,7 +190,7 @@
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
     </Component>
-    <Component class="java.awt.List" name="list1">
+    <Component class="java.awt.List" name="textAreaClient">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="cc" green="cc" red="cc" type="rgb"/>
