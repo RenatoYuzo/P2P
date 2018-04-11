@@ -1,8 +1,8 @@
 package br.com.redes.trab.view;
 
-import br.com.redes.trab.p2p.ClientTCP;
+import br.com.redes.trab.p2p.Client1;
 import br.com.redes.trab.p2p.ClientUDP;
-import br.com.redes.trab.p2p.ServerTCP;
+import br.com.redes.trab.p2p.Server1;
 import br.com.redes.trab.p2p.ServerUDP;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -23,9 +23,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class MainView extends javax.swing.JFrame {
 
     ServerSocket serverSocket;
-    ServerTCP newServer;
+    Server1 newServer;
     Socket client;
-    ClientTCP myClientTCP;
+    Client1 myClientTCP;
     ClientUDP myClientUDP;
     ServerUDP myServerUDP;
     String fileName;
@@ -312,7 +312,7 @@ public class MainView extends javax.swing.JFrame {
         return null;
     }
 
-    public void openServer() {
+    /*public void openServer() {
         Thread myServer = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -348,10 +348,10 @@ public class MainView extends javax.swing.JFrame {
         myClientTCP = new ClientTCP(Integer.parseInt(tfPort.getText()), textArea, textError, listFiles, tfDestFolder.getText(), command, fileName);
         Thread threadClientTCP = new Thread(myClientTCP);
         threadClientTCP.start();
-    }
+    }*/
 
     public void openClientUDP(String command) {
-        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command);
+        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText());
         Thread threadClientUDP = new Thread(myClientUDP);
         threadClientUDP.start();
     }

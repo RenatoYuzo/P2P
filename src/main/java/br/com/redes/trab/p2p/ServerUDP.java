@@ -73,9 +73,8 @@ public class ServerUDP implements Runnable {
                     DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), 5556);
                     socket.send(sendPacket);
                     
-                } else if (command.equals("2")) {
-
-                } else if (command.equals("3")) {
+                } else if (command.trim().equals("2")) {
+                    textArea.add("DOIS RECEBIDO!! UHUL!!");
 
                 }
                 //System.out.println(">>>Discovery packet received from: " + packet.getAddress().getHostAddress());
