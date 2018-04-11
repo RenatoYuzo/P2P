@@ -17,7 +17,7 @@ import java.util.ArrayList;
  *
  * @author RenatoYuzo
  */
-public class Server implements Runnable {
+public class ServerTCP implements Runnable {
 
     private final Socket client;
     private final ServerSocket serverSocket;
@@ -33,7 +33,7 @@ public class Server implements Runnable {
     private BufferedInputStream fileReader;
     private BufferedOutputStream outByte;
 
-    public Server(ServerSocket serverSocket, Socket client, List textArea, List textError, List listFiles, String path) {
+    public ServerTCP(ServerSocket serverSocket, Socket client, List textArea, List textError, List listFiles, String path) {
         this.serverSocket = serverSocket;
         this.client = client;
         this.textArea = textArea;

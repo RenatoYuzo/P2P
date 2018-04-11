@@ -1,8 +1,8 @@
 package br.com.redes.trab.view;
 
-import br.com.redes.trab.p2p.Client;
+import br.com.redes.trab.p2p.ClientTCP;
 import br.com.redes.trab.p2p.ClientUDP;
-import br.com.redes.trab.p2p.Server;
+import br.com.redes.trab.p2p.ServerTCP;
 import br.com.redes.trab.p2p.ServerUDP;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -22,9 +23,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class MainView extends javax.swing.JFrame {
 
     ServerSocket serverSocket;
-    Server newServer;
+    ServerTCP newServer;
     Socket client;
-    Client myClientTCP;
+    ClientTCP myClientTCP;
     ClientUDP myClientUDP;
     ServerUDP myServerUDP;
     String fileName;
@@ -205,10 +206,10 @@ public class MainView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
-        
-        String command = Integer.toString(cbCommand.getSelectedIndex()+1);
+
+        String command = Integer.toString(cbCommand.getSelectedIndex() + 1);
         openClientUDP(command);
-        
+
         /*if (cbCommand.getSelectedIndex() == 0) {
             openClient(cbCommand.getSelectedItem().toString(), null);
         } else if (cbCommand.getSelectedIndex() == 1) {
@@ -222,9 +223,9 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnClientActionPerformed
 
     private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
-        
+
         openServerUDP();
-        
+
         /*tfIP.setEnabled(false);
         tfPort.setEnabled(false);
         tfSrcFolder.setEnabled(false);
@@ -233,37 +234,12 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnServerActionPerformed
 
     private void btnChooseFileSrcFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileSrcFolderActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new java.io.File("."));
-        fileChooser.setDialogTitle("Choose Server source folder");
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            //System.out.println("getCurrentDirectory(): " + fileChooser.getCurrentDirectory());
-            tfSrcFolder.setText(fileChooser.getSelectedFile().getPath());
-            //System.out.println("getSelectedFile() : " + fileChooser.getSelectedFile());
-        } else {
-            System.out.println("No Selection ");
-        }
-
+        chooseDirectory("Choose Server source folder", tfSrcFolder);
 
     }//GEN-LAST:event_btnChooseFileSrcFolderActionPerformed
 
     private void btnChooseFileDestFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileDestFolderActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new java.io.File("."));
-        fileChooser.setDialogTitle("Choose Client destination folder");
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            //System.out.println("getCurrentDirectory(): " + fileChooser.getCurrentDirectory());
-            tfDestFolder.setText(fileChooser.getSelectedFile().getPath());
-            //System.out.println("getSelectedFile() : " + fileChooser.getSelectedFile());
-        } else {
-            System.out.println("No Selection ");
-        }
+        chooseDirectory("Choose Client destination folder", tfDestFolder);
     }//GEN-LAST:event_btnChooseFileDestFolderActionPerformed
 
     /**
@@ -288,7 +264,6 @@ public class MainView extends javax.swing.JFrame {
                 }
                 MainView main = new MainView();
                 main.setVisible(true);
-                //main.openServer();
             }
         });
     }
@@ -314,14 +289,26 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JTextField tfSrcFolder;
     // End of variables declaration//GEN-END:variables
 
+    public void chooseDirectory(String msg, JTextField tf) {
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setDialogTitle(msg);
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            tf.setText(fileChooser.getSelectedFile().getPath());
+        }
+
+    }
+
     public String getSelectedFile() {
         String[] separated;
 
         for (int i = 0; i < listFiles.getItemCount(); i++) {
             if (listFiles.isIndexSelected(i)) {
                 separated = listFiles.getItem(i).split(" ");
-                //System.out.println("separated 0: "+separated[0]);
-                //System.out.println("separated 1: "+separated[1]);
                 return separated[1];
             }
         }
@@ -347,7 +334,7 @@ public class MainView extends javax.swing.JFrame {
                         //textArea.add("Server connected with Client " + client.getPort());
                         //textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
                         //textArea.add("Client HostName = " + client.getInetAddress().getHostName());
-                        newServer = new Server(serverSocket, client, textArea, textError, listFiles, tfSrcFolder.getText());
+                        newServer = new ServerTCP(serverSocket, client, textArea, textError, listFiles, tfSrcFolder.getText());
                         Thread threadServer = new Thread(newServer);
                         threadServer.start();
                     }
@@ -361,17 +348,17 @@ public class MainView extends javax.swing.JFrame {
     }
 
     public void openClient(String command, String fileName) {
-        myClientTCP = new Client(Integer.parseInt(tfPort.getText()), textArea, textError, listFiles, tfDestFolder.getText(), command, fileName);
+        myClientTCP = new ClientTCP(Integer.parseInt(tfPort.getText()), textArea, textError, listFiles, tfDestFolder.getText(), command, fileName);
         Thread threadClientTCP = new Thread(myClientTCP);
         threadClientTCP.start();
     }
-    
+
     public void openClientUDP(String command) {
         myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command);
         Thread threadClientUDP = new Thread(myClientUDP);
         threadClientUDP.start();
     }
-    
+
     public void openServerUDP() {
         myServerUDP = new ServerUDP(textArea, textError, listFiles, tfSrcFolder.getText());
         Thread threadServerUDP = new Thread(myServerUDP);

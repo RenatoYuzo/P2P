@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
  *
  * @author RenatoYuzo
  */
-public class Client implements Runnable {
+public class ClientTCP implements Runnable {
 
     private final List textArea;
     private final List textError;
@@ -29,7 +29,7 @@ public class Client implements Runnable {
     //private final String path = "D:\\Desktop\\Received Files from Server";
     private final String path;
 
-    public Client(int port, List textArea, List textError, List listFiles, String path, String command, String fileName) {
+    public ClientTCP(int port, List textArea, List textError, List listFiles, String path, String command, String fileName) {
         this.port = port;
         this.path = path;
         this.command = command;
