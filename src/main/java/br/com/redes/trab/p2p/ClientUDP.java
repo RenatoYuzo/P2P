@@ -69,7 +69,7 @@ public class ClientUDP implements Runnable {
                 host = split[0];
 
                 for (int i = 1; i < split.length; i++) {
-                    listFiles.add(host + ": " + split[i]);
+                    listFiles.add(host + " " + split[i]);
                 }
 
                 //System.out.println(recv);

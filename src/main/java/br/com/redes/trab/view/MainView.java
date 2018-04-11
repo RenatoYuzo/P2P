@@ -75,7 +75,7 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        tfIP.setText("localhost");
+        tfIP.setText("255.255.255.255");
 
         tfPort.setText("5555");
 
@@ -208,29 +208,26 @@ public class MainView extends javax.swing.JFrame {
     private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
 
         String command = Integer.toString(cbCommand.getSelectedIndex() + 1);
-        openClientUDP(command);
 
-        /*if (cbCommand.getSelectedIndex() == 0) {
-            openClient(cbCommand.getSelectedItem().toString(), null);
+        if (cbCommand.getSelectedIndex() == 0) {
+            openClientUDP(command);
         } else if (cbCommand.getSelectedIndex() == 1) {
             fileName = getSelectedFile();
             if (fileName != null) {
-                openClient(cbCommand.getSelectedItem().toString(), fileName);
+                openClientUDP(command);
             } else {
                 JOptionPane.showMessageDialog(null, "Select one file to download.");
             }
-        }*/
+        }
+
     }//GEN-LAST:event_btnClientActionPerformed
 
     private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
-
-        openServerUDP();
-
-        /*tfIP.setEnabled(false);
+        tfIP.setEnabled(false);
         tfPort.setEnabled(false);
         tfSrcFolder.setEnabled(false);
         btnChooseFileSrcFolder.setEnabled(false);
-        openServer();*/
+        openServerUDP();
     }//GEN-LAST:event_btnServerActionPerformed
 
     private void btnChooseFileSrcFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileSrcFolderActionPerformed
@@ -360,7 +357,7 @@ public class MainView extends javax.swing.JFrame {
     }
 
     public void openServerUDP() {
-        myServerUDP = new ServerUDP(textArea, textError, listFiles, tfSrcFolder.getText());
+        myServerUDP = new ServerUDP(textArea, textError, tfSrcFolder.getText());
         Thread threadServerUDP = new Thread(myServerUDP);
         threadServerUDP.start();
     }

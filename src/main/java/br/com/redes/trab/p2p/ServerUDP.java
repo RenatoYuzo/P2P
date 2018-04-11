@@ -17,14 +17,12 @@ public class ServerUDP implements Runnable {
 
     private final List textArea;
     private final List textError;
-    private final List listFiles;
     private final String path;
     private String command;
 
-    public ServerUDP(List textArea, List textError, List listFiles, String path) {
+    public ServerUDP(List textArea, List textError, String path) {
         this.textArea = textArea;
         this.textError = textError;
-        this.listFiles = listFiles;
         this.path = path;
     }
 
