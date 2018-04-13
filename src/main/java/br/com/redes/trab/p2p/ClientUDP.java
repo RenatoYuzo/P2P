@@ -22,7 +22,7 @@ public class ClientUDP implements Runnable {
     private DatagramPacket sendPacket;
     private DatagramSocket recvSocket;
     private DatagramPacket recvPacket;
-    private final String ip = "255.255.255.255";
+    private final String ip = "192.168.0.255";
     private final String path;
 
     public ClientUDP(List textAreaClient, List textError, List listFiles, String command, String path) {
