@@ -12,39 +12,35 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author RenatoYuzo
  */
-public class ServerTCP {
+public class ServerTCP implements Runnable {
 
     private final String path;
-    private final String ipAddress;
-    private final int port;
+    private final List listFiles;
+    private String ipAddress;
+    private final int port=4545;
     private final List textArea;
     private final List textError;
-    private final List listFiles;
-    private Socket client;
-    private ServerSocket serverSocket;
     private String serverMsg;
     private String clientMsg;
     private PrintWriter out;
     private BufferedReader in;
     private BufferedInputStream fileReader;
     private BufferedOutputStream outByte;
+    private ServerSocket serverSocket;
+    private Socket client;
+    private String fileName;
 
-    public ServerTCP(ServerSocket serverSocket, Socket client, List textArea, List textError, List listFiles, String path, String ipAddress, int port) {
-        this.serverSocket = serverSocket;
-        this.client = client;
+    public ServerTCP(List textArea, List textError, List listFiles, String path, String ipAddress) {
         this.textArea = textArea;
         this.textError = textError;
-        this.listFiles = listFiles;
         this.path = path;
         this.ipAddress = ipAddress;
-        this.port = port;
+        this.listFiles = listFiles;
     }
 
     public void open() {
@@ -53,9 +49,13 @@ public class ServerTCP {
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(ipAddress, port));
+            System.out.println("Server IpAddress: " + serverSocket.getInetAddress().getHostAddress());
+            System.out.println("Server port: " + serverSocket.getLocalPort());
 
             // Esperando por uma conexao com algum ClientTCP
+            System.out.println("Server criado, esperando conexão.");
             client = serverSocket.accept();
+            System.out.println("Server Conectado!");
 
             // Variaveis para troca de mensagens entre ClientTCP e ServerTCP
             out = new PrintWriter(client.getOutputStream(), true);
@@ -64,8 +64,11 @@ public class ServerTCP {
 
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             //clientMsg = in.readLine();
-
-            File file = new File(path + "\\" + clientMsg);
+            
+            fileName = in.readLine();
+            
+            File file = new File(path + "\\" + fileName);
+            System.out.println(path + "\\" + fileName);
             outByte = new BufferedOutputStream(client.getOutputStream());
 
             if (!file.exists()) {
@@ -87,12 +90,16 @@ public class ServerTCP {
 
         } catch (IOException ex) {
             ex.printStackTrace();
+            closeConnection();
         }
 
     }
 
     public void closeConnection() {
         try {
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
             if (client != null) {
                 client.close();
             }
@@ -112,6 +119,23 @@ public class ServerTCP {
         } catch (IOException e) {
             textError.add("Error: " + e.getMessage());
         }
+    }
+    
+    public String getSelectedFile() {
+        String[] separated;
+
+        for (int i = 0; i < listFiles.getItemCount(); i++) {
+            if (listFiles.isIndexSelected(i)) {
+                separated = listFiles.getItem(i).split(" ");
+                return separated[1];
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void run() {
+        open();
     }
 
 }

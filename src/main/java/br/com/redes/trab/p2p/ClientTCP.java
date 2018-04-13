@@ -22,7 +22,7 @@ public class ClientTCP implements Runnable{
     private final List textAreaClient;
     private final List textError;
     private final List listFiles;
-    private final int port;
+    private final int port=4545;
     private final String ipAddress;
     private final String fileName;
     private PrintWriter out1;
@@ -37,9 +37,8 @@ public class ClientTCP implements Runnable{
     private PrintWriter out;
     private BufferedOutputStream outputFile;
 
-    public ClientTCP(List textAreaClient, List textError, List listFiles, String path, String fileName, String ipAddress, int port) {
+    public ClientTCP(List textAreaClient, List textError, List listFiles, String path, String fileName, String ipAddress) {
         this.ipAddress = ipAddress;
-        this.port = port;
         this.path = path;
         this.fileName = fileName;
         this.textAreaClient = textAreaClient;
@@ -51,10 +50,14 @@ public class ClientTCP implements Runnable{
 
         try {
             // Abrindo um socket no ip e na porta fornecidos pelo ClientUDP
-            socket = new Socket(null);
+            System.out.println("Client IpAddress: " + ipAddress);
+            System.out.println("Client port: " + port);
+            socket = new Socket();
             socket.setReuseAddress(true);
-            socket.bind(new InetSocketAddress(ipAddress, port));
-
+            //socket.bind(new InetSocketAddress(ipAddress, port));
+            socket.connect(new InetSocketAddress(ipAddress, port), 6000);
+            System.out.println("Client Conectado!");
+            
             // Inicializacao das variaveis para utilizacao de troca de mensagens e troca de arquivos
             in = new InputStreamReader(System.in);
             reader = new BufferedReader(in);
@@ -63,9 +66,15 @@ public class ClientTCP implements Runnable{
             inputByte = socket.getInputStream();
             input = new BufferedInputStream(inputByte);
             out = new PrintWriter(socket.getOutputStream(), true);
-
+            
+            
+            
+            
+            out1.println(fileName);
+            
             // Recebe um Byte (0 ou 1) do ServerTCP, 0 se arquivo nao existe, 1 se arquivo existe
             int code = input.read();
+            System.out.println("code: " + code);
             
             if (code == 1) {
                 outputFile = new BufferedOutputStream(new FileOutputStream(path + "\\" + fileName));

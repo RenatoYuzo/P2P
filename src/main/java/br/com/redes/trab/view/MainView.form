@@ -67,6 +67,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnChooseFileDestFolder" min="-2" pref="25" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="tfDownload" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -91,6 +92,7 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="tfPort" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="tfDownload" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -180,9 +182,10 @@
     <Component class="javax.swing.JComboBox" name="cbCommand">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
-            <StringItem index="0" value="1 - Get Available Files"/>
-            <StringItem index="1" value="2 - Download File"/>
+          <StringArray count="3">
+            <StringItem index="0" value="1 - Get All IP&apos;s From RCA"/>
+            <StringItem index="1" value="2 - Get All Available Files"/>
+            <StringItem index="2" value="3 - Download File"/>
           </StringArray>
         </Property>
       </Properties>
@@ -236,6 +239,8 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChooseFileDestFolderActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfDownload">
     </Component>
   </SubComponents>
 </Form>

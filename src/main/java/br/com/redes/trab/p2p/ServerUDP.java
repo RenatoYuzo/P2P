@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -17,28 +18,28 @@ public class ServerUDP implements Runnable {
 
     private final List textArea;
     private final List textError;
+    private final List listFiles;
     private final String path;
     private String command;
+    private DatagramPacket recvPacket = null;
 
-    public ServerUDP(List textArea, List textError, String path) {
+    public ServerUDP(List textArea, List textError, List listFiles, String path) {
         this.textArea = textArea;
         this.textError = textError;
         this.path = path;
+        this.listFiles = listFiles;
     }
 
     @Override
     public void run() {
         try {
-            DatagramSocket socket;
+            DatagramSocket recvSocket;
 
             //Keep a socket open to listen to all the UDP trafic that is destined for this port
-            
-            
-            socket = new DatagramSocket(null);
-            InetSocketAddress address = new InetSocketAddress(5555);            
-            socket.setReuseAddress(true);            
-            socket.bind(address);
-            socket.setBroadcast(true);
+            recvSocket = new DatagramSocket(5555);
+            //recvSocket.setReuseAddress(true);
+            //recvSocket.setBroadcast(true);
+            //recvSocket.bind(new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), 5555));            
 
             while (true) {
                 textArea.add(">>>Ready to receive broadcast packets!");
@@ -46,51 +47,43 @@ public class ServerUDP implements Runnable {
 
                 //Receive a packet
                 byte[] recvData = new byte[1024];
-                DatagramPacket recvPacket = new DatagramPacket(recvData, recvData.length);
-                socket.receive(recvPacket);
+                //recvPacket = new DatagramPacket(recvData, recvData.length, InetAddress.getByName("255.255.255.255"), 5555);
+                recvPacket = new DatagramPacket(recvData, recvData.length);
+                recvSocket.receive(recvPacket);
 
                 //Packet received
                 textArea.add(">>>Discovery packet received from: " + recvPacket.getAddress().getHostAddress());
                 textArea.add(">>>Packet received; data: " + new String(recvPacket.getData()));
 
                 command = new String(recvPacket.getData());
-                
 
-                if (command.trim().equals("1")) {
-                    
+                if (command.trim().equals("2")) {
+
                     //System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                    
                     ArrayList<String> listOfNameFiles = getFiles();
-                    String msg = recvPacket.getAddress().getHostAddress();
+                    System.out.println(Inet4Address.getLocalHost().getHostAddress());
+                    String msg = Inet4Address.getLocalHost().getHostAddress();
+                    
                     for (int i = 0; i < listOfNameFiles.size(); i++) {
                         msg = msg + "," + listOfNameFiles.get(i);
                     }
-                    
-                    //System.out.println(msg);
+
+                    System.out.println("Enviado: " + msg);
                     byte[] sendData = msg.getBytes();
-                    
-                    
+
                     DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), 5556);
-                    socket.send(sendPacket);
-                    
-                } else if (command.trim().equals("2")) {
-                    textArea.add("DOIS RECEBIDO!! UHUL!!");
+                    recvSocket.send(sendPacket);
 
+                } else if (command.trim().equals("3")) {
+                    if (recvPacket != null) {
+                        textArea.add("Tres RECEBIDO!! UHUL!!");
+                        System.out.println("recvPacket.getAddress().getHostAddress(): " + Inet4Address.getLocalHost().getHostAddress());
+                        ServerTCP serverTCP = new ServerTCP(textArea, textError, listFiles, path, Inet4Address.getLocalHost().getHostAddress());
+                        Thread threadServerTCP = new Thread(serverTCP);
+                        threadServerTCP.start();
+                    }
                 }
-                //System.out.println(">>>Discovery packet received from: " + packet.getAddress().getHostAddress());
-                //System.out.println(">>>Packet received; data: " + new String(packet.getData()));
 
-                //See if the packet holds the right command (message)
-                /*String message = new String(packet.getData()).trim();
-                if (message.equals("DISCOVER_FUIFSERVER_REQUEST")) {
-                    byte[] sendData = "DISCOVER_FUIFSERVER_RESPONSE".getBytes();
-
-                    //Send a response
-                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort());
-                    socket.send(sendPacket);
-
-                    System.out.println(">>>Sent packet to: " + sendPacket.getAddress().getHostAddress());
-                }*/
             }
         } catch (IOException ex) {
             textError.add(ex.getMessage());

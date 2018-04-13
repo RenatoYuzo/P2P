@@ -40,16 +40,20 @@ public class ClientUDP implements Runnable {
             //Abre Socket em uma porta aleatoria para envio de pacotes
             sendSocket = new DatagramSocket();
             sendSocket.setBroadcast(true);
-            sendSocket.setReuseAddress(true);
+            //sendSocket.setReuseAddress(true);
+            //sendSocket.bind(new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), 40521));
 
+            
+            textAreaClient.add(">>> Request sent to: " + ip);
+            //System.out.println(">>> Request sent to: " + ip);
+            
             /*  Se command = 1, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download 
                 Se command = 2, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */
-            if (command.equals("1")) {
-                textAreaClient.add(">>> Request sent to: " + ip);
-                //System.out.println(">>> Request sent to: " + ip);
-                byte[] sendData = command.getBytes();
-                sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
-                sendSocket.send(sendPacket);
+            byte[] sendData = command.getBytes();
+            sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
+            sendSocket.send(sendPacket);
+            
+            if (command.equals("2")) {
 
                 byte[] recvData = new byte[1024];
                 recvPacket = new DatagramPacket(recvData, recvData.length);
@@ -66,6 +70,7 @@ public class ClientUDP implements Runnable {
                 while (true) {
 
                     recvSocket.receive(recvPacket);
+                    System.out.println("Recebido: " + new String(recvPacket.getData()));
 
                     recv = new String(recvPacket.getData());
                     //System.out.println(recv);
@@ -78,17 +83,18 @@ public class ClientUDP implements Runnable {
 
                     //System.out.println(recv);
                     //System.out.println(recvPacket.getAddress().getHostAddress() + ": " + new String(recvPacket.getData()));
-                    textAreaClient.add("Received File List from " + recvPacket.getAddress().getHostAddress());
+                    textAreaClient.add("Received File List from " + host);
                 }
-            } else if (command.equals("2")) {
+            } else if (command.equals("3")) {
+                //Thread.sleep(2000);
                 String[] selectedFile = getSelectedFile();
                 String ip = selectedFile[0];
                 String fileName = selectedFile[1];
 
-                ClientTCP clientTCP = new ClientTCP(textAreaClient, textError, listFiles, path, fileName, ip, 5555);
+                ClientTCP clientTCP = new ClientTCP(textAreaClient, textError, listFiles, path, fileName, ip);
                 Thread threadClientTCP = new Thread(clientTCP);
                 threadClientTCP.start();
-            }
+            } 
 
             //socket.close();
         } catch (SocketException ex) {

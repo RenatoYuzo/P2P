@@ -35,6 +35,7 @@ public class MainView extends javax.swing.JFrame {
      */
     public MainView() {
         initComponents();
+        //tfDownload.setVisible(false);
     }
 
     /**
@@ -63,6 +64,7 @@ public class MainView extends javax.swing.JFrame {
         tfDestFolder = new javax.swing.JTextField();
         btnChooseFileSrcFolder = new javax.swing.JButton();
         btnChooseFileDestFolder = new javax.swing.JButton();
+        tfDownload = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("P2P");
@@ -94,7 +96,7 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 - Get Available Files", "2 - Download File" }));
+        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 - Get All IP's From RCA", "2 - Get All Available Files", "3 - Download File" }));
 
         textAreaClient.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -159,7 +161,8 @@ public class MainView extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tfDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnChooseFileDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(btnChooseFileDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(tfDownload))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -176,7 +179,8 @@ public class MainView extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
+                            .addComponent(jLabel2)
+                            .addComponent(tfDownload, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -209,13 +213,17 @@ public class MainView extends javax.swing.JFrame {
 
         String command = Integer.toString(cbCommand.getSelectedIndex() + 1);
 
-        if (cbCommand.getSelectedIndex() == 0) {
+        if (cbCommand.getSelectedIndex() == 1) {
             openClientUDP(command);
-        } else if (cbCommand.getSelectedIndex() == 1) {
+        } else if (cbCommand.getSelectedIndex() == 2) {
             fileName = getSelectedFile();
             if (fileName != null) {
                 openClientUDP(command);
-            } else {
+            } 
+            else if(listFiles.getItemCount() == 0) {
+                JOptionPane.showMessageDialog(null, "Empty list of files.");
+            } 
+            else {
                 JOptionPane.showMessageDialog(null, "Select one file to download.");
             }
         }
@@ -281,6 +289,7 @@ public class MainView extends javax.swing.JFrame {
     private java.awt.List textAreaClient;
     private java.awt.List textError;
     private javax.swing.JTextField tfDestFolder;
+    private javax.swing.JTextField tfDownload;
     private javax.swing.JTextField tfIP;
     private javax.swing.JTextField tfPort;
     private javax.swing.JTextField tfSrcFolder;
@@ -349,7 +358,6 @@ public class MainView extends javax.swing.JFrame {
         Thread threadClientTCP = new Thread(myClientTCP);
         threadClientTCP.start();
     }*/
-
     public void openClientUDP(String command) {
         myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText());
         Thread threadClientUDP = new Thread(myClientUDP);
@@ -357,7 +365,7 @@ public class MainView extends javax.swing.JFrame {
     }
 
     public void openServerUDP() {
-        myServerUDP = new ServerUDP(textArea, textError, tfSrcFolder.getText());
+        myServerUDP = new ServerUDP(textArea, textError, listFiles, tfSrcFolder.getText());
         Thread threadServerUDP = new Thread(myServerUDP);
         threadServerUDP.start();
     }
