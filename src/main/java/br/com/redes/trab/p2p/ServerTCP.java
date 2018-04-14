@@ -20,13 +20,10 @@ import java.net.Socket;
 public class ServerTCP implements Runnable {
 
     private final String path;
-    private final List listFiles;
-    private String ipAddress;
+    private final String ipAddress;
     private final int port=4545;
     private final List textArea;
     private final List textError;
-    private String serverMsg;
-    private String clientMsg;
     private PrintWriter out;
     private BufferedReader in;
     private BufferedInputStream fileReader;
@@ -35,12 +32,11 @@ public class ServerTCP implements Runnable {
     private Socket client;
     private String fileName;
 
-    public ServerTCP(List textArea, List textError, List listFiles, String path, String ipAddress) {
+    public ServerTCP(List textArea, List textError, String path, String ipAddress) {
         this.textArea = textArea;
         this.textError = textError;
         this.path = path;
         this.ipAddress = ipAddress;
-        this.listFiles = listFiles;
     }
 
     public void open() {
@@ -49,6 +45,7 @@ public class ServerTCP implements Runnable {
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(ipAddress, port));
+            serverSocket.setSoTimeout(2000);
             System.out.println("Server IpAddress: " + serverSocket.getInetAddress().getHostAddress());
             System.out.println("Server port: " + serverSocket.getLocalPort());
 
@@ -59,11 +56,7 @@ public class ServerTCP implements Runnable {
 
             // Variaveis para troca de mensagens entre ClientTCP e ServerTCP
             out = new PrintWriter(client.getOutputStream(), true);
-            //serverMsg = "Hello from Server!";
-            //out.println(serverMsg);
-
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            //clientMsg = in.readLine();
             
             fileName = in.readLine();
             
@@ -84,8 +77,6 @@ public class ServerTCP implements Runnable {
                 }
 
             }
-
-            //serverMsg = "File " + clientMsg + " has been successfully downloaded.";
             closeConnection();
 
         } catch (IOException ex) {
@@ -119,18 +110,6 @@ public class ServerTCP implements Runnable {
         } catch (IOException e) {
             textError.add("Error: " + e.getMessage());
         }
-    }
-    
-    public String getSelectedFile() {
-        String[] separated;
-
-        for (int i = 0; i < listFiles.getItemCount(); i++) {
-            if (listFiles.isIndexSelected(i)) {
-                separated = listFiles.getItem(i).split(" ");
-                return separated[1];
-            }
-        }
-        return null;
     }
 
     @Override

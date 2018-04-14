@@ -21,13 +21,11 @@ public class ClientTCP implements Runnable{
 
     private final List textAreaClient;
     private final List textError;
-    private final List listFiles;
     private final int port=4545;
     private final String ipAddress;
     private final String fileName;
     private PrintWriter out1;
     private BufferedReader input1;
-    //private final String path = "D:\\Desktop\\Received Files from Server";
     private final String path;
     private InputStreamReader in;
     private BufferedReader reader;
@@ -37,13 +35,12 @@ public class ClientTCP implements Runnable{
     private PrintWriter out;
     private BufferedOutputStream outputFile;
 
-    public ClientTCP(List textAreaClient, List textError, List listFiles, String path, String fileName, String ipAddress) {
+    public ClientTCP(List textAreaClient, List textError, String path, String fileName, String ipAddress) {
         this.ipAddress = ipAddress;
         this.path = path;
         this.fileName = fileName;
         this.textAreaClient = textAreaClient;
         this.textError = textError;
-        this.listFiles = listFiles;
     }
 
     public void open() {
@@ -67,9 +64,6 @@ public class ClientTCP implements Runnable{
             input = new BufferedInputStream(inputByte);
             out = new PrintWriter(socket.getOutputStream(), true);
             
-            
-            
-            
             out1.println(fileName);
             
             // Recebe um Byte (0 ou 1) do ServerTCP, 0 se arquivo nao existe, 1 se arquivo existe
@@ -85,13 +79,11 @@ public class ClientTCP implements Runnable{
                     outputFile.write(buffer, 0, bytesRead);
                     outputFile.flush();
                 }
+                System.out.println("");
 
                 JOptionPane.showMessageDialog(null, "File: " + fileName + " was successfully downloaded!");
-                
-                //System.out.println("File: " + fileName + " was successfully downloaded!");
             } else {
                 JOptionPane.showMessageDialog(null, "File is not present on the server.");
-                //System.out.println("File is not present on the server!");
             }
             closeConnection();
         } catch (IOException ex) {

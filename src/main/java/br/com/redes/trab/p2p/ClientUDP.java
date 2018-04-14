@@ -6,7 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,7 +16,7 @@ public class ClientUDP implements Runnable {
     private final List textAreaClient;
     private final List textError;
     private final List listFiles;
-    private String command;
+    private final String command;
     private DatagramSocket sendSocket;
     private DatagramPacket sendPacket;
     private DatagramSocket recvSocket;
@@ -40,15 +39,12 @@ public class ClientUDP implements Runnable {
             //Abre Socket em uma porta aleatoria para envio de pacotes
             sendSocket = new DatagramSocket();
             sendSocket.setBroadcast(true);
-            //sendSocket.setReuseAddress(true);
-            //sendSocket.bind(new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), 40521));
-
             
-            textAreaClient.add(">>> Request sent to: " + ip);
-            //System.out.println(">>> Request sent to: " + ip);
+            textAreaClient.add(">>> Request sent to " + ip + " broadcast.");
             
             /*  Se command = 1, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download 
                 Se command = 2, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */
+
             byte[] sendData = command.getBytes();
             sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
             sendSocket.send(sendPacket);
@@ -73,30 +69,24 @@ public class ClientUDP implements Runnable {
                     System.out.println("Recebido: " + new String(recvPacket.getData()));
 
                     recv = new String(recvPacket.getData());
-                    //System.out.println(recv);
                     String[] split = recv.split(",");
                     host = split[0];
 
                     for (int i = 1; i < split.length; i++) {
                         listFiles.add(host + " " + split[i]);
                     }
-
-                    //System.out.println(recv);
-                    //System.out.println(recvPacket.getAddress().getHostAddress() + ": " + new String(recvPacket.getData()));
                     textAreaClient.add("Received File List from " + host);
                 }
             } else if (command.equals("3")) {
-                //Thread.sleep(2000);
                 String[] selectedFile = getSelectedFile();
                 String ip = selectedFile[0];
                 String fileName = selectedFile[1];
 
-                ClientTCP clientTCP = new ClientTCP(textAreaClient, textError, listFiles, path, fileName, ip);
+                ClientTCP clientTCP = new ClientTCP(textAreaClient, textError, path, fileName, ip);
                 Thread threadClientTCP = new Thread(clientTCP);
                 threadClientTCP.start();
+                closeConnection();
             } 
-
-            //socket.close();
         } catch (SocketException ex) {
             textError.add(ex.getMessage());
             closeConnection();
@@ -124,6 +114,10 @@ public class ClientUDP implements Runnable {
 
     public String[] getSelectedFile() {
         String[] separated;
+        
+        if (listFiles.getItemCount() == 0) {
+            return null;
+        }
 
         for (int i = 0; i < listFiles.getItemCount(); i++) {
             if (listFiles.isIndexSelected(i)) {
