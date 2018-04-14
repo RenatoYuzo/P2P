@@ -4,8 +4,6 @@ import br.com.redes.trab.p2p.Client1;
 import br.com.redes.trab.p2p.ClientUDP;
 import br.com.redes.trab.p2p.Server1;
 import br.com.redes.trab.p2p.ServerUDP;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -47,6 +45,12 @@ public class MainView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        pmClear = new javax.swing.JPopupMenu();
+        miClear = new javax.swing.JMenuItem();
+        pmClear1 = new javax.swing.JPopupMenu();
+        miClear1 = new javax.swing.JMenuItem();
+        pmClear2 = new javax.swing.JPopupMenu();
+        miClear2 = new javax.swing.JMenuItem();
         listFiles = new java.awt.List();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
@@ -66,9 +70,39 @@ public class MainView extends javax.swing.JFrame {
         btnChooseFileDestFolder = new javax.swing.JButton();
         tfDownload = new javax.swing.JTextField();
 
+        miClear.setText("Clear");
+        miClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miClearActionPerformed(evt);
+            }
+        });
+        pmClear.add(miClear);
+
+        miClear1.setText("Clear");
+        miClear1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miClear1ActionPerformed(evt);
+            }
+        });
+        pmClear1.add(miClear1);
+
+        miClear2.setText("Clear");
+        miClear2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miClear2ActionPerformed(evt);
+            }
+        });
+        pmClear2.add(miClear2);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("P2P");
         setResizable(false);
+
+        listFiles.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                listFilesMouseReleased(evt);
+            }
+        });
 
         btnServer.setText("Server");
         btnServer.addActionListener(new java.awt.event.ActionListener() {
@@ -86,6 +120,11 @@ public class MainView extends javax.swing.JFrame {
         jLabel2.setText("Port:");
 
         textArea.setBackground(new java.awt.Color(204, 204, 204));
+        textArea.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                textAreaMouseReleased(evt);
+            }
+        });
 
         textError.setBackground(new java.awt.Color(255, 204, 204));
 
@@ -99,6 +138,11 @@ public class MainView extends javax.swing.JFrame {
         cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 - Get All IP's From RCA", "2 - Get All Available Files", "3 - Download File" }));
 
         textAreaClient.setBackground(new java.awt.Color(204, 204, 204));
+        textAreaClient.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                textAreaClientMouseReleased(evt);
+            }
+        });
 
         tfSrcFolder.setText("D:\\Desktop\\Shared Files");
 
@@ -219,11 +263,9 @@ public class MainView extends javax.swing.JFrame {
             fileName = getSelectedFile();
             if (fileName != null) {
                 openClientUDP(command);
-            } 
-            else if(listFiles.getItemCount() == 0) {
+            } else if (listFiles.getItemCount() == 0) {
                 JOptionPane.showMessageDialog(null, "Empty list of files.");
-            } 
-            else {
+            } else {
                 JOptionPane.showMessageDialog(null, "Select one file to download.");
             }
         }
@@ -246,6 +288,42 @@ public class MainView extends javax.swing.JFrame {
     private void btnChooseFileDestFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileDestFolderActionPerformed
         chooseDirectory("Choose Client destination folder", tfDestFolder);
     }//GEN-LAST:event_btnChooseFileDestFolderActionPerformed
+
+    private void miClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miClearActionPerformed
+        if (listFiles.getItemCount() > 0) {
+            listFiles.removeAll();
+        }
+    }//GEN-LAST:event_miClearActionPerformed
+
+    private void listFilesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listFilesMouseReleased
+        if (evt.isPopupTrigger()) {
+            pmClear.show(listFiles, evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_listFilesMouseReleased
+
+    private void miClear1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miClear1ActionPerformed
+        if (textArea.getItemCount() > 0) {
+            textArea.removeAll();
+        }
+    }//GEN-LAST:event_miClear1ActionPerformed
+
+    private void miClear2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miClear2ActionPerformed
+        if (textAreaClient.getItemCount() > 0) {
+            textAreaClient.removeAll();
+        }
+    }//GEN-LAST:event_miClear2ActionPerformed
+
+    private void textAreaMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textAreaMouseReleased
+        if (evt.isPopupTrigger()) {
+            pmClear1.show(textArea, evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_textAreaMouseReleased
+
+    private void textAreaClientMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textAreaClientMouseReleased
+        if (evt.isPopupTrigger()) {
+            pmClear2.show(textAreaClient, evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_textAreaClientMouseReleased
 
     /**
      * @param args the command line arguments
@@ -285,6 +363,12 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private java.awt.List listFiles;
+    private javax.swing.JMenuItem miClear;
+    private javax.swing.JMenuItem miClear1;
+    private javax.swing.JMenuItem miClear2;
+    private javax.swing.JPopupMenu pmClear;
+    private javax.swing.JPopupMenu pmClear1;
+    private javax.swing.JPopupMenu pmClear2;
     private java.awt.List textArea;
     private java.awt.List textAreaClient;
     private java.awt.List textError;

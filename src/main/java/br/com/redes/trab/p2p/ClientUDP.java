@@ -71,7 +71,8 @@ public class ClientUDP implements Runnable {
                     recv = new String(recvPacket.getData());
                     String[] split = recv.split(",");
                     host = split[0];
-
+                    
+                    listFiles.removeAll();
                     for (int i = 1; i < split.length; i++) {
                         listFiles.add(host + " " + split[i]);
                     }
