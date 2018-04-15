@@ -1,4 +1,4 @@
-package br.com.redes.trab.p2p;
+package redes.trab.server;
 
 import java.awt.List;
 import java.io.BufferedInputStream;
@@ -21,7 +21,7 @@ public class ServerTCP implements Runnable {
 
     private final String path;
     private final String ipAddress;
-    private final int port=4545;
+    private final int port = 4545;
     private final List textArea;
     private final List textError;
     private final String fileName;
@@ -40,7 +40,8 @@ public class ServerTCP implements Runnable {
         this.fileName = fileName;
     }
 
-    public void open() {
+    @Override
+    public void run() {
         try {
             // Abrindo um socket no ip e na porta fornecidos pelo ServerUDP
             serverSocket = new ServerSocket();
@@ -58,36 +59,38 @@ public class ServerTCP implements Runnable {
             // Variaveis para troca de mensagens entre ClientTCP e ServerTCP
             out = new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            
+
             //fileName = in.readLine();
-            
-            File file = new File(path + "\\" + fileName);
-            System.out.println(path + "\\" + fileName);
-            outByte = new BufferedOutputStream(client.getOutputStream());
-
-            if (!file.exists()) {
-                outByte.write((byte) 0); // Se arquivo nao existe na pasta, manda um Byte 0
-            } else {
-                outByte.write((byte) 1); // Se arquivo encontrado na pasta, manda um Byte 1
-                fileReader = new BufferedInputStream(new FileInputStream(file));
-                byte[] buffer = new byte[1024];
-                int bytesRead = 0;
-                while ((bytesRead = fileReader.read(buffer)) != -1) {
-                    outByte.write(buffer, 0, bytesRead);
-                    outByte.flush();
-                }
-
-            }
+            sendingFileToClientTCP();
             closeConnection();
 
         } catch (IOException ex) {
             ex.printStackTrace();
             closeConnection();
         }
-
     }
 
-    public void closeConnection() {
+    private void sendingFileToClientTCP() throws IOException {
+        File file = new File(path + "\\" + fileName);
+        System.out.println(path + "\\" + fileName);
+        outByte = new BufferedOutputStream(client.getOutputStream());
+
+        if (!file.exists()) {
+            outByte.write((byte) 0); // Se arquivo nao existe na pasta, manda um Byte 0
+        } else {
+            outByte.write((byte) 1); // Se arquivo encontrado na pasta, manda um Byte 1
+            fileReader = new BufferedInputStream(new FileInputStream(file));
+            byte[] buffer = new byte[1024];
+            int bytesRead = 0;
+            while ((bytesRead = fileReader.read(buffer)) != -1) {
+                outByte.write(buffer, 0, bytesRead);
+                outByte.flush();
+            }
+
+        }
+    }
+
+    private void closeConnection() {
         try {
             if (serverSocket != null) {
                 serverSocket.close();
@@ -111,11 +114,6 @@ public class ServerTCP implements Runnable {
         } catch (IOException e) {
             textError.add("Error: " + e.getMessage());
         }
-    }
-
-    @Override
-    public void run() {
-        open();
     }
 
 }

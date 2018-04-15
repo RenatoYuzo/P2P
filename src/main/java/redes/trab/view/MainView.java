@@ -1,7 +1,7 @@
-package br.com.redes.trab.view;
+package redes.trab.view;
 
-import br.com.redes.trab.p2p.ClientUDP;
-import br.com.redes.trab.p2p.ServerUDP;
+import redes.trab.client.ClientUDP;
+import redes.trab.server.ServerUDP;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;

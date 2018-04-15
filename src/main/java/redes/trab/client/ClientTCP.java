@@ -1,4 +1,4 @@
-package br.com.redes.trab.p2p;
+package redes.trab.client;
 
 import java.awt.List;
 import java.io.BufferedInputStream;
@@ -17,11 +17,11 @@ import javax.swing.JOptionPane;
  *
  * @author RenatoYuzo
  */
-public class ClientTCP implements Runnable{
+public class ClientTCP implements Runnable {
 
     private final List textAreaClient;
     private final List textError;
-    private final int port=4545;
+    private final int port = 4545;
     private final String ipAddress;
     private final String fileName;
     private PrintWriter out1;
@@ -43,8 +43,8 @@ public class ClientTCP implements Runnable{
         this.textError = textError;
     }
 
-    public void open() {
-
+    @Override
+    public void run() {
         try {
             // Abrindo um socket no ip e na porta fornecidos pelo ClientUDP
             System.out.println("Client IpAddress: " + ipAddress);
@@ -54,7 +54,7 @@ public class ClientTCP implements Runnable{
             //socket.bind(new InetSocketAddress(ipAddress, port));
             socket.connect(new InetSocketAddress(ipAddress, port), 6000);
             System.out.println("Client Conectado!");
-            
+
             // Inicializacao das variaveis para utilizacao de troca de mensagens e troca de arquivos
             in = new InputStreamReader(System.in);
             reader = new BufferedReader(in);
@@ -63,13 +63,12 @@ public class ClientTCP implements Runnable{
             inputByte = socket.getInputStream();
             input = new BufferedInputStream(inputByte);
             out = new PrintWriter(socket.getOutputStream(), true);
-            
+
             //out1.println(fileName);
-            
             // Recebe um Byte (0 ou 1) do ServerTCP, 0 se arquivo nao existe, 1 se arquivo existe
             int code = input.read();
             System.out.println("code: " + code);
-            
+
             if (code == 1) {
                 outputFile = new BufferedOutputStream(new FileOutputStream(path + "\\" + fileName));
                 byte[] buffer = new byte[1024];
@@ -81,9 +80,9 @@ public class ClientTCP implements Runnable{
                 }
                 System.out.println("");
 
-                JOptionPane.showMessageDialog(null, "File: " + fileName + " was successfully downloaded!");
+                JOptionPane.showMessageDialog(null, "File: " + fileName.toUpperCase() + " was successfully downloaded!", "File Downloaded.", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, "File is not present on the server.");
+                JOptionPane.showMessageDialog(null, "File is not present on the server.", "No File", JOptionPane.WARNING_MESSAGE);
             }
             closeConnection();
         } catch (IOException ex) {
@@ -126,11 +125,6 @@ public class ClientTCP implements Runnable{
             textError.add(ex.getMessage());
         }
 
-    }
-
-    @Override
-    public void run() {
-        open();
     }
 
 }

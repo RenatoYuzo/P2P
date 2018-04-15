@@ -1,4 +1,4 @@
-package br.com.redes.trab.p2p;
+package redes.trab.client;
 
 import java.awt.List;
 import java.io.IOException;
