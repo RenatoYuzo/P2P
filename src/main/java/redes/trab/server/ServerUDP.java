@@ -59,7 +59,7 @@ public class ServerUDP implements Runnable {
 
             }
         } catch (IOException ex) {
-            textError.add(ex.getMessage());
+            textError.add(this.getClass().getSimpleName() + ": " + ex.getMessage());
         }
     }
 
@@ -83,8 +83,13 @@ public class ServerUDP implements Runnable {
 
     }
 
-    private void sendingRespondeFromOption1() {
-        JOptionPane.showMessageDialog(null, "Not implemented yet.");
+    private void sendingRespondeFromOption1() throws IOException {
+        String ip = Inet4Address.getLocalHost().getHostAddress();
+        
+        byte[] sendData = ip.getBytes();
+
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), 5556);
+        recvSocket.send(sendPacket);
     }
 
     private void sendingRespondeFromOption3() throws UnknownHostException {

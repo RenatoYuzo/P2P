@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import javax.swing.JOptionPane;
 
@@ -65,12 +66,8 @@ public class ClientUDP implements Runnable {
             }
 
             closeConnection();
-        } catch (SocketException ex) {
-            textError.add(ex.getMessage());
-            closeConnection();
         } catch (Exception e) {
             textError.add(e.getMessage());
-            fileFoundCount();
             closeConnection();
         }
 
@@ -92,7 +89,7 @@ public class ClientUDP implements Runnable {
 
     }
 
-    private void fileFoundCount() {
+    private void numberOfFileFoundCount() {
         switch (listFiles.getItemCount()) {
             case 0:
                 JOptionPane.showMessageDialog(null, "No file found.", "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -102,6 +99,20 @@ public class ClientUDP implements Runnable {
                 break;
             default:
                 JOptionPane.showMessageDialog(null, listFiles.getItemCount() + " files found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+        }
+    }
+
+    private void numberOfIpFoundCount() {
+        switch (listFiles.getItemCount()) {
+            case 0:
+                JOptionPane.showMessageDialog(null, "No IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "1 IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, listFiles.getItemCount() + " IP's found.", "Message", JOptionPane.INFORMATION_MESSAGE);
                 break;
         }
     }
@@ -123,7 +134,10 @@ public class ClientUDP implements Runnable {
     }
 
     private void sendingRequestFromOption1() throws UnknownHostException, IOException {
-
+        byte[] sendData = strAux.getBytes();
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
+        sendSocket.send(sendPacket);
+        textAreaClient.add(">>> Request sent to " + ip + " broadcast.");
     }
 
     private void sendingRequestFromOption2() throws UnknownHostException, IOException {
@@ -154,38 +168,75 @@ public class ClientUDP implements Runnable {
     }
 
     private void waitingResponseFromOption1() {
-        JOptionPane.showMessageDialog(null, "Not implemented yet.");
+        try {
+            recvSocket = new DatagramSocket(null);
+            InetSocketAddress address = new InetSocketAddress(5556);
+            recvSocket.setReuseAddress(true);
+            recvSocket.bind(address);
+            recvSocket.setBroadcast(true);
+            recvSocket.setSoTimeout(2000);
+
+            String recv = "";
+            String host = "";
+            listFiles.removeAll();
+            while (true) {
+                byte[] recvData = new byte[1024];
+                recvPacket = new DatagramPacket(recvData, recvData.length);
+                recvSocket.receive(recvPacket);
+                System.out.println("Recebido: " + new String(recvPacket.getData()));
+
+                recv = new String(recvPacket.getData());
+                listFiles.add(recv);
+            }
+        } catch (SocketTimeoutException ste) {
+            textAreaClient.add(">>> Client Received TimeOut");
+            numberOfIpFoundCount();
+        } catch (SocketException se) {
+            textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
+        } catch (IOException ioe) {
+            textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
+        }
 
     }
 
-    private void waitingResponseFromOption2() throws SocketException, IOException {
+    private void waitingResponseFromOption2() {
 
-        recvSocket = new DatagramSocket(null);
-        InetSocketAddress address = new InetSocketAddress(5556);
-        recvSocket.setReuseAddress(true);
-        recvSocket.bind(address);
-        recvSocket.setBroadcast(true);
-        recvSocket.setSoTimeout(2000);
+        try {
+            recvSocket = new DatagramSocket(null);
+            InetSocketAddress address = new InetSocketAddress(5556);
+            recvSocket.setReuseAddress(true);
+            recvSocket.bind(address);
+            recvSocket.setBroadcast(true);
+            recvSocket.setSoTimeout(2000);
 
-        String recv = "";
-        String host = "";
-        listFiles.removeAll();
-        while (true) {
-            byte[] recvData = new byte[1024];
-            recvPacket = new DatagramPacket(recvData, recvData.length);
-            recvSocket.receive(recvPacket);
-            System.out.println("Recebido: " + new String(recvPacket.getData()));
+            String recv = "";
+            String host = "";
+            listFiles.removeAll();
+            while (true) {
+                byte[] recvData = new byte[1024];
+                recvPacket = new DatagramPacket(recvData, recvData.length);
+                recvSocket.receive(recvPacket);
+                System.out.println("Recebido: " + new String(recvPacket.getData()));
 
-            recv = new String(recvPacket.getData());
-            String[] split = recv.split(",");
-            host = split[0];
+                recv = new String(recvPacket.getData());
+                String[] split = recv.split(",");
+                host = split[0];
 
-            for (int i = 1; i < split.length; i++) {
-                listFiles.add(host + " " + split[i]);
+                for (int i = 1; i < split.length; i++) {
+                    listFiles.add(host + " " + split[i]);
+                }
+                textAreaClient.add("Received File List from " + host);
+
             }
-            textAreaClient.add("Received File List from " + host);
-
+        } catch (SocketTimeoutException ste) {
+            textAreaClient.add(">>> Client Received TimeOut");
+            numberOfFileFoundCount();
+        } catch (SocketException se) {
+            textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
+        } catch (IOException ioe) {
+            textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
+
     }
 
     private void waitingResponseFromOption3() {
@@ -198,37 +249,47 @@ public class ClientUDP implements Runnable {
         threadClientTCP.start();
     }
 
-    private void waitingResponseFromOption4() throws SocketException, IOException {
+    private void waitingResponseFromOption4() {
 
-        recvSocket = new DatagramSocket(null);
-        InetSocketAddress address = new InetSocketAddress(5556);
-        recvSocket.setReuseAddress(true);
-        recvSocket.bind(address);
-        recvSocket.setBroadcast(true);
-        recvSocket.setSoTimeout(2000);
+        try {
+            recvSocket = new DatagramSocket(null);
+            InetSocketAddress address = new InetSocketAddress(5556);
+            recvSocket.setReuseAddress(true);
+            recvSocket.bind(address);
+            recvSocket.setBroadcast(true);
+            recvSocket.setSoTimeout(2000);
 
-        String recv = "";
-        String host = "";
+            String recv = "";
+            String host = "";
 
-        listFiles.removeAll();
-        while (true) {
-            byte[] recvData = new byte[1024];
-            recvPacket = new DatagramPacket(recvData, recvData.length);
-            recvSocket.receive(recvPacket);
-            System.out.println("Recebido: " + new String(recvPacket.getData()));
+            listFiles.removeAll();
+            while (true) {
+                byte[] recvData = new byte[1024];
+                recvPacket = new DatagramPacket(recvData, recvData.length);
+                recvSocket.receive(recvPacket);
+                System.out.println("Recebido: " + new String(recvPacket.getData()));
 
-            recv = new String(recvPacket.getData());
-            String[] split = recv.split(",");
-            host = split[0];
+                recv = new String(recvPacket.getData());
+                String[] split = recv.split(",");
+                host = split[0];
 
-            for (int i = 1; i < split.length; i++) {
-                if (split[i].equals(askedFile)) {
-                    listFiles.add(host + " " + split[i]);
+                for (int i = 1; i < split.length; i++) {
+                    if (split[i].equals(askedFile)) {
+                        listFiles.add(host + " " + split[i]);
+                    }
                 }
+                textAreaClient.add("Received File List from " + host);
+
             }
-            textAreaClient.add("Received File List from " + host);
-            
+        } catch (SocketTimeoutException ste) {
+            textAreaClient.add(">>> Client Received TimeOut");
+            numberOfFileFoundCount();
+        } catch (SocketException se) {
+            textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
+        } catch (IOException ioe) {
+            textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
+
     }
 
 }
