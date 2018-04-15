@@ -13,10 +13,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class ServerTCP implements Runnable {
 
     private final String path;
@@ -47,20 +43,18 @@ public class ServerTCP implements Runnable {
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(ipAddress, port));
+            
+            // Server espera uma conexao por 5 segundos ate dar um TimeOut
             serverSocket.setSoTimeout(5000);
-            System.out.println("Server IpAddress: " + serverSocket.getInetAddress().getHostAddress());
-            System.out.println("Server port: " + serverSocket.getLocalPort());
 
             // Esperando por uma conexao com algum ClientTCP
-            System.out.println("Server criado, esperando conexão.");
             client = serverSocket.accept();
-            System.out.println("Server Conectado!");
 
             // Variaveis para troca de mensagens entre ClientTCP e ServerTCP
             out = new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            //fileName = in.readLine();
+            // Envia o arquivo que o Client pediu, se estiver disponivel
             sendingFileToClientTCP();
             closeConnection();
 

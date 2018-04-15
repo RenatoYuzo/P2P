@@ -13,13 +13,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class ClientTCP implements Runnable {
 
-    private final List textAreaClient;
     private final List textError;
     private final int port = 4545;
     private final String ipAddress;
@@ -35,25 +30,23 @@ public class ClientTCP implements Runnable {
     private PrintWriter out;
     private BufferedOutputStream outputFile;
 
-    public ClientTCP(List textAreaClient, List textError, String path, String fileName, String ipAddress) {
+    public ClientTCP(List textError, String path, String fileName, String ipAddress) {
         this.ipAddress = ipAddress;
         this.path = path;
         this.fileName = fileName;
-        this.textAreaClient = textAreaClient;
         this.textError = textError;
     }
 
     @Override
     public void run() {
         try {
-            // Abrindo um socket no ip e na porta fornecidos pelo ClientUDP
-            System.out.println("Client IpAddress: " + ipAddress);
-            System.out.println("Client port: " + port);
+            
             socket = new Socket();
             socket.setReuseAddress(true);
-            //socket.bind(new InetSocketAddress(ipAddress, port));
+            
+            // Conecta o ClientTCP no ip e porta para receber pacotes de um especifico ServerTCP
+            // ClientTCP espera por 6 segundos pela conexao com o especifico ServerTCP
             socket.connect(new InetSocketAddress(ipAddress, port), 6000);
-            System.out.println("Client Conectado!");
 
             // Inicializacao das variaveis para utilizacao de troca de mensagens e troca de arquivos
             in = new InputStreamReader(System.in);
@@ -64,21 +57,18 @@ public class ClientTCP implements Runnable {
             input = new BufferedInputStream(inputByte);
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            //out1.println(fileName);
             // Recebe um Byte (0 ou 1) do ServerTCP, 0 se arquivo nao existe, 1 se arquivo existe
             int code = input.read();
-            System.out.println("code: " + code);
 
             if (code == 1) {
                 outputFile = new BufferedOutputStream(new FileOutputStream(path + "\\" + fileName));
                 byte[] buffer = new byte[1024];
                 int bytesRead = 0;
                 while ((bytesRead = input.read(buffer)) != -1) {
-                    System.out.print("|"); //acts as a download indicator
+                    //System.out.print("|"); //acts as a download indicator
                     outputFile.write(buffer, 0, bytesRead);
                     outputFile.flush();
                 }
-                System.out.println("");
 
                 JOptionPane.showMessageDialog(null, "File: " + fileName.toUpperCase() + " was successfully downloaded!", "File Downloaded.", JOptionPane.INFORMATION_MESSAGE);
             } else {

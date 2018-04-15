@@ -11,10 +11,6 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class ClientUDP implements Runnable {
 
     private final List textAreaClient;
@@ -49,8 +45,10 @@ public class ClientUDP implements Runnable {
 
             strAux = command + ",";
 
-            /*  Se command = 2, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download 
-                Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */
+            /*  Se command = 1, ClientUDP faz uma busca de todos os IP's da rede
+                Se command = 2, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download 
+                Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do arquivo selecionado
+                Se command = 4, ClientUDP pergunta para todos os ServersUDP, se eles tem o arquivo digitado */
             if (command.equals("1")) {
                 sendingRequestFromOption1();
                 waitingResponseFromOption1();
@@ -141,7 +139,6 @@ public class ClientUDP implements Runnable {
     }
 
     private void sendingRequestFromOption2() throws UnknownHostException, IOException {
-        System.out.println("strAux: " + strAux);
         byte[] sendData = strAux.getBytes();
         sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
         sendSocket.send(sendPacket);
@@ -151,7 +148,6 @@ public class ClientUDP implements Runnable {
     private void sendingRequestFromOption3() throws UnknownHostException, IOException {
         String[] aux = getSelectedFile();
         strAux += aux[1];
-        System.out.println("strAux += aux[1]: " + strAux);
         byte[] sendData = strAux.getBytes();
         sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
         sendSocket.send(sendPacket);
@@ -160,7 +156,6 @@ public class ClientUDP implements Runnable {
 
     private void sendingRequestFromOption4() throws UnknownHostException, IOException {
         strAux += askedFile;
-        System.out.println("strAux += aux[1]: " + strAux);
         byte[] sendData = strAux.getBytes();
         sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
         sendSocket.send(sendPacket);
@@ -177,15 +172,13 @@ public class ClientUDP implements Runnable {
             recvSocket.setSoTimeout(2000);
 
             String recv = "";
-            String host = "";
             listFiles.removeAll();
             while (true) {
                 byte[] recvData = new byte[1024];
                 recvPacket = new DatagramPacket(recvData, recvData.length);
                 recvSocket.receive(recvPacket);
-                System.out.println("Recebido: " + new String(recvPacket.getData()));
-
                 recv = new String(recvPacket.getData());
+                
                 listFiles.add(recv);
             }
         } catch (SocketTimeoutException ste) {
@@ -216,7 +209,6 @@ public class ClientUDP implements Runnable {
                 byte[] recvData = new byte[1024];
                 recvPacket = new DatagramPacket(recvData, recvData.length);
                 recvSocket.receive(recvPacket);
-                System.out.println("Recebido: " + new String(recvPacket.getData()));
 
                 recv = new String(recvPacket.getData());
                 String[] split = recv.split(",");
@@ -226,7 +218,6 @@ public class ClientUDP implements Runnable {
                     listFiles.add(host + " " + split[i]);
                 }
                 textAreaClient.add("Received File List from " + host);
-
             }
         } catch (SocketTimeoutException ste) {
             textAreaClient.add(">>> Client Received TimeOut");
@@ -244,7 +235,7 @@ public class ClientUDP implements Runnable {
         String ipAddress = selectedFile[0];
         String nameFile = selectedFile[1];
 
-        ClientTCP clientTCP = new ClientTCP(textAreaClient, textError, path, nameFile, ipAddress);
+        ClientTCP clientTCP = new ClientTCP(textError, path, nameFile, ipAddress);
         Thread threadClientTCP = new Thread(clientTCP);
         threadClientTCP.start();
     }
@@ -267,7 +258,6 @@ public class ClientUDP implements Runnable {
                 byte[] recvData = new byte[1024];
                 recvPacket = new DatagramPacket(recvData, recvData.length);
                 recvSocket.receive(recvPacket);
-                System.out.println("Recebido: " + new String(recvPacket.getData()));
 
                 recv = new String(recvPacket.getData());
                 String[] split = recv.split(",");
@@ -279,7 +269,6 @@ public class ClientUDP implements Runnable {
                     }
                 }
                 textAreaClient.add("Received File List from " + host);
-
             }
         } catch (SocketTimeoutException ste) {
             textAreaClient.add(">>> Client Received TimeOut");

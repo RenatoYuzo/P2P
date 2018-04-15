@@ -14,10 +14,6 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class MainView extends javax.swing.JFrame {
 
     ServerSocket serverSocket;
@@ -57,9 +53,7 @@ public class MainView extends javax.swing.JFrame {
         listFiles = new java.awt.List();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
-        tfPort = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         textArea = new java.awt.List();
         textError = new java.awt.List();
         btnClient = new javax.swing.JButton();
@@ -118,11 +112,7 @@ public class MainView extends javax.swing.JFrame {
         tfIP.setText("255.255.255.255");
         tfIP.setEnabled(false);
 
-        tfPort.setText("5555");
-
         jLabel1.setText("IP Address:");
-
-        jLabel2.setText("Port:");
 
         textArea.setBackground(new java.awt.Color(204, 204, 204));
         textArea.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -195,19 +185,14 @@ public class MainView extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(tfPort, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(tfIP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)))
+                                .addComponent(tfIP, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(tfSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(1, 1, 1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(163, 163, 163)))
+                                .addGap(1, 1, 1)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(textAreaClient, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
@@ -235,10 +220,7 @@ public class MainView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2)
-                            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -296,7 +278,6 @@ public class MainView extends javax.swing.JFrame {
 
     private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
         tfIP.setEnabled(false);
-        tfPort.setEnabled(false);
         tfSrcFolder.setEnabled(false);
         btnChooseFileSrcFolder.setEnabled(false);
         openServerUDP();
@@ -389,7 +370,6 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton btnServer;
     private javax.swing.JComboBox<String> cbCommand;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JToolBar jToolBar1;
@@ -406,7 +386,6 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JTextField tfDestFolder;
     private javax.swing.JTextField tfDownload;
     private javax.swing.JTextField tfIP;
-    private javax.swing.JTextField tfPort;
     private javax.swing.JTextField tfSrcFolder;
     // End of variables declaration//GEN-END:variables
 
@@ -436,12 +415,14 @@ public class MainView extends javax.swing.JFrame {
         return null;
     }
 
+    /* Metodo que inicia o ClientUDP */
     public void openClientUDP(String command) {
         myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText(), tfDownload.getText());
         Thread threadClientUDP = new Thread(myClientUDP);
         threadClientUDP.start();
     }
 
+    /* Metodo que inicia o ServerUDP */
     public void openServerUDP() {
         myServerUDP = new ServerUDP(textArea, textError, tfSrcFolder.getText());
         Thread threadServerUDP = new Thread(myServerUDP);

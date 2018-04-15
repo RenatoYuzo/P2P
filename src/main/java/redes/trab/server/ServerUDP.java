@@ -10,12 +10,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class ServerUDP implements Runnable {
 
     private final List textArea;
@@ -36,17 +31,22 @@ public class ServerUDP implements Runnable {
     @Override
     public void run() {
         try {
-            //Keep a socket open to listen to all the UDP trafic that is destined for this port
+            // Abre um socket para escutar todo conteudo destinado a porta 5555
             recvSocket = new DatagramSocket(null);
             recvSocket.setReuseAddress(true);
             recvSocket.setBroadcast(true);
             recvSocket.bind(new InetSocketAddress(5555));
-
+            
+            // Loop infinito para sempre manter o ServerUDP escutando
             while (true) {
                 textArea.add(">>>   Ready to receive broadcast packets!");
                 
+                // O ServerUDP recebera um pacote contendo uma String,
+                // essa String tem uma padrao: numero do comando,nome do arquivo
+                // Exemplo: 1,doc.txt
                 receivedPacket();
 
+                // Para cada comando (1, 2, 3 ou 4), o ServerUDP fornece sua devida resposta para aquele comando
                 if (commandSplit[0].equals("1")) {
                     sendingRespondeFromOption1();
                 } else if (commandSplit[0].equals("2")) {
@@ -93,8 +93,6 @@ public class ServerUDP implements Runnable {
     }
 
     private void sendingRespondeFromOption3() throws UnknownHostException {
-        System.out.println("Inet4Address.getLocalHost().getHostAddress(): " + Inet4Address.getLocalHost().getHostAddress());
-
         ServerTCP serverTCP = new ServerTCP(textArea, textError, path, Inet4Address.getLocalHost().getHostAddress(), fileName);
         Thread threadServerTCP = new Thread(serverTCP);
         threadServerTCP.start();
@@ -109,27 +107,28 @@ public class ServerUDP implements Runnable {
             msg = msg + "," + listOfNameFiles.get(i);
         }
 
-        System.out.println("Enviado: " + msg);
         byte[] sendData = msg.getBytes();
-
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), 5556);
         recvSocket.send(sendPacket);
     }
 
+    /*  Este metodo ira receber um pacote contendo o comando que o Client pediu,
+        quando recebe esse pacote, utiliza da funcao split para dividir a String,
+        a primeira parte da String é a opcao pedida pelo Client e 
+        a segunda parte é o nome do arquivo, se precisar fornece-lo
+    */
     private void receivedPacket() throws IOException {
         byte[] recvData = new byte[1024];
         recvPacket = new DatagramPacket(recvData, recvData.length);
         recvSocket.receive(recvPacket);
 
-        //Packet received
-        textArea.add(">>>Discovery packet received from: " + recvPacket.getAddress().getHostAddress());
-        textArea.add(">>>Packet received; data: " + new String(recvPacket.getData()));
-
+        textArea.add(">>>   Discovery packet from: " + recvPacket.getAddress().getHostAddress());
+        textArea.add("          PacketData: " + new String(recvPacket.getData()));
+        
         command = new String(recvPacket.getData());
         commandSplit = command.split(",");
         fileName = commandSplit[1];
         fileName = fileName.trim();
-        System.out.println("fileName: " + fileName);
     }
 
 }
