@@ -1,11 +1,11 @@
 package br.com.redes.trab.view;
 
-import br.com.redes.trab.p2p.Client1;
 import br.com.redes.trab.p2p.ClientUDP;
-import br.com.redes.trab.p2p.Server1;
 import br.com.redes.trab.p2p.ServerUDP;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -21,9 +21,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class MainView extends javax.swing.JFrame {
 
     ServerSocket serverSocket;
-    Server1 newServer;
     Socket client;
-    Client1 myClientTCP;
     ClientUDP myClientUDP;
     ServerUDP myServerUDP;
     String fileName;
@@ -33,7 +31,12 @@ public class MainView extends javax.swing.JFrame {
      */
     public MainView() {
         initComponents();
-        //tfDownload.setVisible(false);
+        try {
+            tfIP.setText(Inet4Address.getLocalHost().getHostAddress());
+            jToolBar1.setVisible(false);
+        } catch (UnknownHostException ex) {
+            textError.add(ex.getMessage());
+        }
     }
 
     /**
@@ -68,6 +71,7 @@ public class MainView extends javax.swing.JFrame {
         tfDestFolder = new javax.swing.JTextField();
         btnChooseFileSrcFolder = new javax.swing.JButton();
         btnChooseFileDestFolder = new javax.swing.JButton();
+        jToolBar1 = new javax.swing.JToolBar();
         tfDownload = new javax.swing.JTextField();
 
         miClear.setText("Clear");
@@ -112,6 +116,7 @@ public class MainView extends javax.swing.JFrame {
         });
 
         tfIP.setText("255.255.255.255");
+        tfIP.setEnabled(false);
 
         tfPort.setText("5555");
 
@@ -135,7 +140,12 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 - Get All IP's From RCA", "2 - Get All Available Files", "3 - Download File" }));
+        cbCommand.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 - Get All IP's From RCA", "2 - Get All Available Files", "3 - Download Selected File", "4 - Request Specific File" }));
+        cbCommand.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbCommandActionPerformed(evt);
+            }
+        });
 
         textAreaClient.setBackground(new java.awt.Color(204, 204, 204));
         textAreaClient.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -165,6 +175,10 @@ public class MainView extends javax.swing.JFrame {
                 btnChooseFileDestFolderActionPerformed(evt);
             }
         });
+
+        jToolBar1.setBorder(null);
+        jToolBar1.setFloatable(false);
+        jToolBar1.add(tfDownload);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -206,7 +220,7 @@ public class MainView extends javax.swing.JFrame {
                                 .addComponent(tfDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnChooseFileDestFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(tfDownload))))
+                            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -224,7 +238,7 @@ public class MainView extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
-                            .addComponent(tfDownload, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnChooseFileSrcFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -243,10 +257,10 @@ public class MainView extends javax.swing.JFrame {
                     .addComponent(textArea, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(textAreaClient, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textError, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(textError, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(listFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13))
+                .addComponent(listFiles, javax.swing.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -257,16 +271,24 @@ public class MainView extends javax.swing.JFrame {
 
         String command = Integer.toString(cbCommand.getSelectedIndex() + 1);
 
-        if (cbCommand.getSelectedIndex() == 1) {
+        if (command.equals("1")) {
             openClientUDP(command);
-        } else if (cbCommand.getSelectedIndex() == 2) {
+        } else if (command.equals("2")) {
+            openClientUDP(command);
+        } else if (command.equals("3")) {
             fileName = getSelectedFile();
             if (fileName != null) {
                 openClientUDP(command);
             } else if (listFiles.getItemCount() == 0) {
-                JOptionPane.showMessageDialog(null, "Empty list of files.");
+                JOptionPane.showMessageDialog(null, "First, you need to request available files (Option 2). Or ask for one (Option 4)", "Empty list of files", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, "Select one file to download.");
+                JOptionPane.showMessageDialog(null, "Select one file to download", "No file selected.", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else if (command.equals("4")) {
+            if (tfDownload.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Type the file's name that you want to download.", "Type the file's name", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                openClientUDP(command);
             }
         }
 
@@ -325,6 +347,14 @@ public class MainView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_textAreaClientMouseReleased
 
+    private void cbCommandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCommandActionPerformed
+        if (cbCommand.getSelectedIndex() == 3) {
+            jToolBar1.setVisible(true);
+        } else {
+            jToolBar1.setVisible(false);
+        }
+    }//GEN-LAST:event_cbCommandActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -362,6 +392,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JToolBar jToolBar1;
     private java.awt.List listFiles;
     private javax.swing.JMenuItem miClear;
     private javax.swing.JMenuItem miClear1;
@@ -405,51 +436,14 @@ public class MainView extends javax.swing.JFrame {
         return null;
     }
 
-    /*public void openServer() {
-        Thread myServer = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    serverSocket = new ServerSocket();
-                    serverSocket.bind(new InetSocketAddress(tfIP.getText(), Integer.parseInt(tfPort.getText())));
-
-                    textArea.add("Server port: " + serverSocket.getLocalPort());
-                    textArea.add("Server HostAddress = " + serverSocket.getInetAddress().getHostAddress());
-                    textArea.add("Server HostName = " + serverSocket.getInetAddress().getHostName());
-
-                    while (true) {
-                        textArea.add("====== Main Server waiting for Client ======");
-                        client = serverSocket.accept();
-
-                        //textArea.add("Server connected with Client " + client.getPort());
-                        //textArea.add("Client HostAddress = " + client.getInetAddress().getHostAddress());
-                        //textArea.add("Client HostName = " + client.getInetAddress().getHostName());
-                        newServer = new ServerTCP(serverSocket, client, textArea, textError, listFiles, tfSrcFolder.getText());
-                        Thread threadServer = new Thread(newServer);
-                        threadServer.start();
-                    }
-
-                } catch (IOException ex) {
-                    textError.add("Error: " + ex.getMessage());
-                }
-            }
-        });
-        myServer.start();
-    }
-
-    public void openClient(String command, String fileName) {
-        myClientTCP = new ClientTCP(Integer.parseInt(tfPort.getText()), textArea, textError, listFiles, tfDestFolder.getText(), command, fileName);
-        Thread threadClientTCP = new Thread(myClientTCP);
-        threadClientTCP.start();
-    }*/
     public void openClientUDP(String command) {
-        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText());
+        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText(), tfDownload.getText());
         Thread threadClientUDP = new Thread(myClientUDP);
         threadClientUDP.start();
     }
 
     public void openServerUDP() {
-        myServerUDP = new ServerUDP(textArea, textError, listFiles, tfSrcFolder.getText());
+        myServerUDP = new ServerUDP(textArea, textError, tfSrcFolder.getText());
         Thread threadServerUDP = new Thread(myServerUDP);
         threadServerUDP.start();
     }

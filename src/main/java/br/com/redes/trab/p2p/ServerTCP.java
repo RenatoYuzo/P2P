@@ -24,19 +24,20 @@ public class ServerTCP implements Runnable {
     private final int port=4545;
     private final List textArea;
     private final List textError;
+    private final String fileName;
     private PrintWriter out;
     private BufferedReader in;
     private BufferedInputStream fileReader;
     private BufferedOutputStream outByte;
     private ServerSocket serverSocket;
     private Socket client;
-    private String fileName;
 
-    public ServerTCP(List textArea, List textError, String path, String ipAddress) {
+    public ServerTCP(List textArea, List textError, String path, String ipAddress, String fileName) {
         this.textArea = textArea;
         this.textError = textError;
         this.path = path;
         this.ipAddress = ipAddress;
+        this.fileName = fileName;
     }
 
     public void open() {
@@ -45,7 +46,7 @@ public class ServerTCP implements Runnable {
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(ipAddress, port));
-            serverSocket.setSoTimeout(2000);
+            serverSocket.setSoTimeout(5000);
             System.out.println("Server IpAddress: " + serverSocket.getInetAddress().getHostAddress());
             System.out.println("Server port: " + serverSocket.getLocalPort());
 
@@ -58,7 +59,7 @@ public class ServerTCP implements Runnable {
             out = new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             
-            fileName = in.readLine();
+            //fileName = in.readLine();
             
             File file = new File(path + "\\" + fileName);
             System.out.println(path + "\\" + fileName);

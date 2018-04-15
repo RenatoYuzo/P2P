@@ -64,7 +64,7 @@ public class ClientTCP implements Runnable{
             input = new BufferedInputStream(inputByte);
             out = new PrintWriter(socket.getOutputStream(), true);
             
-            out1.println(fileName);
+            //out1.println(fileName);
             
             // Recebe um Byte (0 ou 1) do ServerTCP, 0 se arquivo nao existe, 1 se arquivo existe
             int code = input.read();
