@@ -96,6 +96,7 @@ public class ServerTCP implements Runnable {
                 serverSocket.close();
             }
             if (client != null) {
+                textArea.add("Client " + client.getPort() + " has disconnected");
                 client.close();
             }
             if (out != null) {
@@ -110,7 +111,6 @@ public class ServerTCP implements Runnable {
             if (outByte != null) {
                 outByte.close();
             }
-            textArea.add("Client " + client.getPort() + " has disconnected");
         } catch (IOException e) {
             textError.add("Error: " + e.getMessage());
         }

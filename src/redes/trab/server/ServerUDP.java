@@ -21,16 +21,18 @@ public class ServerUDP implements Runnable {
     private final List textArea;
     private final List textError;
     private final String path;
+    private final String myIP;
     private String command;
     private DatagramPacket recvPacket = null;
     DatagramSocket recvSocket;
     private String fileName;
     private String[] commandSplit;
 
-    public ServerUDP(List textArea, List textError, String path) {
+    public ServerUDP(List textArea, List textError, String path, String myIP) {
         this.textArea = textArea;
         this.textError = textError;
         this.path = path;
+        this.myIP = myIP;
     }
 
     @Override
@@ -40,7 +42,7 @@ public class ServerUDP implements Runnable {
             recvSocket = new DatagramSocket(null);
             recvSocket.setReuseAddress(true);
             recvSocket.setBroadcast(true);
-            recvSocket.bind(new InetSocketAddress(5555));
+            recvSocket.bind(new InetSocketAddress(myIP, 5555));
 
             while (true) {
                 textArea.add(">>>   Ready to receive broadcast packets!");
@@ -59,6 +61,7 @@ public class ServerUDP implements Runnable {
 
             }
         } catch (IOException ex) {
+            ex.printStackTrace();
             textError.add(this.getClass().getSimpleName() + ": " + ex.getMessage());
         }
     }
@@ -77,6 +80,7 @@ public class ServerUDP implements Runnable {
             }
             return listOfNameFiles;
         } catch (Exception e) {
+            e.printStackTrace();
             textError.add("Error: " + e.getMessage());
         }
         return null;
@@ -84,7 +88,8 @@ public class ServerUDP implements Runnable {
     }
 
     private void sendingRespondeFromOption1() throws IOException {
-        String ip = Inet4Address.getLocalHost().getHostAddress();
+        //String ip = Inet4Address.getLocalHost().getHostAddress();
+        String ip = myIP;
         
         byte[] sendData = ip.getBytes();
 
@@ -95,7 +100,7 @@ public class ServerUDP implements Runnable {
     private void sendingRespondeFromOption3() throws UnknownHostException {
         System.out.println("Inet4Address.getLocalHost().getHostAddress(): " + Inet4Address.getLocalHost().getHostAddress());
 
-        ServerTCP serverTCP = new ServerTCP(textArea, textError, path, Inet4Address.getLocalHost().getHostAddress(), fileName);
+        ServerTCP serverTCP = new ServerTCP(textArea, textError, path, myIP, fileName);
         Thread threadServerTCP = new Thread(serverTCP);
         threadServerTCP.start();
     }
@@ -103,8 +108,9 @@ public class ServerUDP implements Runnable {
     private void sendingResponseFromOption2and4() throws IOException {
         ArrayList<String> listOfNameFiles = getFiles();
         System.out.println(Inet4Address.getLocalHost().getHostAddress());
-        String msg = Inet4Address.getLocalHost().getHostAddress();
-
+        //String msg = Inet4Address.getLocalHost().getHostAddress();
+        String msg = myIP;
+        
         for (int i = 0; i < listOfNameFiles.size(); i++) {
             msg = msg + "," + listOfNameFiles.get(i);
         }

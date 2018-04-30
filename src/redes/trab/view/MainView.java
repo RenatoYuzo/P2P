@@ -57,7 +57,7 @@ public class MainView extends javax.swing.JFrame {
         listFiles = new java.awt.List();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
-        tfPort = new javax.swing.JTextField();
+        tfBroadcastIP = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         textArea = new java.awt.List();
@@ -115,14 +115,11 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        tfIP.setText("255.255.255.255");
-        tfIP.setEnabled(false);
-
-        tfPort.setText("5555");
+        tfBroadcastIP.setText("192.168.0.255");
 
         jLabel1.setText("IP Address:");
 
-        jLabel2.setText("Port:");
+        jLabel2.setText("Broadcast IP:");
 
         textArea.setBackground(new java.awt.Color(204, 204, 204));
         textArea.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -196,7 +193,7 @@ public class MainView extends javax.swing.JFrame {
                                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(tfPort, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(tfBroadcastIP, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(tfIP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel3)
@@ -236,7 +233,7 @@ public class MainView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(tfPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfBroadcastIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
                             .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -296,7 +293,7 @@ public class MainView extends javax.swing.JFrame {
 
     private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
         tfIP.setEnabled(false);
-        tfPort.setEnabled(false);
+        tfBroadcastIP.setEnabled(false);
         tfSrcFolder.setEnabled(false);
         btnChooseFileSrcFolder.setEnabled(false);
         openServerUDP();
@@ -364,7 +361,7 @@ public class MainView extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                try {
+                /*try {
                     UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
@@ -374,7 +371,7 @@ public class MainView extends javax.swing.JFrame {
                     Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (UnsupportedLookAndFeelException ex) {
                     Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                }*/
                 MainView main = new MainView();
                 main.setVisible(true);
             }
@@ -403,10 +400,10 @@ public class MainView extends javax.swing.JFrame {
     private java.awt.List textArea;
     private java.awt.List textAreaClient;
     private java.awt.List textError;
+    private javax.swing.JTextField tfBroadcastIP;
     private javax.swing.JTextField tfDestFolder;
     private javax.swing.JTextField tfDownload;
     private javax.swing.JTextField tfIP;
-    private javax.swing.JTextField tfPort;
     private javax.swing.JTextField tfSrcFolder;
     // End of variables declaration//GEN-END:variables
 
@@ -437,13 +434,13 @@ public class MainView extends javax.swing.JFrame {
     }
 
     public void openClientUDP(String command) {
-        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText(), tfDownload.getText());
+        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText(), tfDownload.getText(), tfIP.getText(), tfBroadcastIP.getText());
         Thread threadClientUDP = new Thread(myClientUDP);
         threadClientUDP.start();
     }
 
     public void openServerUDP() {
-        myServerUDP = new ServerUDP(textArea, textError, tfSrcFolder.getText());
+        myServerUDP = new ServerUDP(textArea, textError, tfSrcFolder.getText(), tfIP.getText());
         Thread threadServerUDP = new Thread(myServerUDP);
         threadServerUDP.start();
     }

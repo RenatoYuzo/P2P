@@ -22,21 +22,24 @@ public class ClientUDP implements Runnable {
     private final List listFiles;
     private final String command;
     private final String askedFile;
+    private final String myIP;
     private DatagramSocket sendSocket;
     private DatagramPacket sendPacket;
     private DatagramSocket recvSocket;
     private DatagramPacket recvPacket;
-    private final String ip = "192.168.0.255";
+    private final String broadcastIP;
     private final String path;
     private String strAux;
 
-    public ClientUDP(List textAreaClient, List textError, List listFiles, String command, String path, String askedFile) {
+    public ClientUDP(List textAreaClient, List textError, List listFiles, String command, String path, String askedFile, String myIP, String broadcastIP) {
         this.textAreaClient = textAreaClient;
         this.textError = textError;
         this.listFiles = listFiles;
         this.command = command;
         this.path = path;
         this.askedFile = askedFile;
+        this.myIP = myIP;
+        this.broadcastIP = broadcastIP;
     }
 
     @Override
@@ -67,6 +70,7 @@ public class ClientUDP implements Runnable {
 
             closeConnection();
         } catch (Exception e) {
+            e.printStackTrace();
             textError.add(e.getMessage());
             closeConnection();
         }
@@ -135,17 +139,17 @@ public class ClientUDP implements Runnable {
 
     private void sendingRequestFromOption1() throws UnknownHostException, IOException {
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + ip + " broadcast.");
+        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
     }
 
     private void sendingRequestFromOption2() throws UnknownHostException, IOException {
         System.out.println("strAux: " + strAux);
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + ip + " broadcast.");
+        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
     }
 
     private void sendingRequestFromOption3() throws UnknownHostException, IOException {
@@ -153,18 +157,18 @@ public class ClientUDP implements Runnable {
         strAux += aux[1];
         System.out.println("strAux += aux[1]: " + strAux);
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + ip + " broadcast.");
+        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
     }
 
     private void sendingRequestFromOption4() throws UnknownHostException, IOException {
         strAux += askedFile;
         System.out.println("strAux += aux[1]: " + strAux);
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(ip), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + ip + " broadcast.");
+        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
     }
 
     private void waitingResponseFromOption1() {
@@ -192,8 +196,10 @@ public class ClientUDP implements Runnable {
             textAreaClient.add(">>> Client Received TimeOut");
             numberOfIpFoundCount();
         } catch (SocketException se) {
+            se.printStackTrace();
             textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
         } catch (IOException ioe) {
+            ioe.printStackTrace();
             textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
 
@@ -285,8 +291,10 @@ public class ClientUDP implements Runnable {
             textAreaClient.add(">>> Client Received TimeOut");
             numberOfFileFoundCount();
         } catch (SocketException se) {
+            se.printStackTrace();
             textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
         } catch (IOException ioe) {
+            ioe.printStackTrace();
             textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
 

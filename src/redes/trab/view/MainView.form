@@ -87,7 +87,7 @@
                               <Component id="jLabel1" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="tfPort" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="tfBroadcastIP" alignment="1" max="32767" attributes="0"/>
                                   <Component id="tfIP" alignment="1" pref="313" max="32767" attributes="0"/>
                               </Group>
                           </Group>
@@ -140,7 +140,7 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="tfPort" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="tfBroadcastIP" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jToolBar1" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -191,14 +191,10 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="tfIP">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="255.255.255.255"/>
-        <Property name="enabled" type="boolean" value="false"/>
-      </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tfPort">
+    <Component class="javax.swing.JTextField" name="tfBroadcastIP">
       <Properties>
-        <Property name="text" type="java.lang.String" value="5555"/>
+        <Property name="text" type="java.lang.String" value="192.168.0.255"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
@@ -208,7 +204,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Port:"/>
+        <Property name="text" type="java.lang.String" value="Broadcast IP:"/>
       </Properties>
     </Component>
     <Component class="java.awt.List" name="textArea">

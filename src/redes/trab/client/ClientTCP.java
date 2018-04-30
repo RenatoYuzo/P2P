@@ -86,6 +86,7 @@ public class ClientTCP implements Runnable {
             }
             closeConnection();
         } catch (IOException ex) {
+            ex.printStackTrace();
             textError.add(ex.getMessage());
             closeConnection();
         }
@@ -122,6 +123,7 @@ public class ClientTCP implements Runnable {
                 outputFile.close();
             }
         } catch (IOException ex) {
+            ex.printStackTrace();
             textError.add(ex.getMessage());
         }
 
