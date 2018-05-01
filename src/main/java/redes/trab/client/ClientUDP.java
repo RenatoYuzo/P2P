@@ -1,6 +1,5 @@
 package redes.trab.client;
 
-import java.awt.List;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,34 +9,17 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import javax.swing.JOptionPane;
+import redes.trab.util.Variables;
 import redes.trab.view.MainView;
 
 public class ClientUDP implements Runnable {
 
-    private final List textAreaClient;
-    private final List textError;
-    private final List listFiles;
-    private final String command;
-    private final String askedFile;
-    private final String myIP;
     private DatagramSocket sendSocket;
     private DatagramPacket sendPacket;
     private DatagramSocket recvSocket;
     private DatagramPacket recvPacket;
-    private final String broadcastIP;
-    private final String path;
+    private Variables v = new Variables();
     private String strAux;
-
-    public ClientUDP(List textAreaClient, List textError, List listFiles, String command, String path, String askedFile, String myIP, String broadcastIP) {
-        this.textAreaClient = textAreaClient;
-        this.textError = textError;
-        this.listFiles = listFiles;
-        this.command = command;
-        this.path = path;
-        this.askedFile = askedFile;
-        this.myIP = myIP;
-        this.broadcastIP = broadcastIP;
-    }
 
     @Override
     public void run() {
@@ -47,28 +29,35 @@ public class ClientUDP implements Runnable {
             sendSocket = new DatagramSocket();
             sendSocket.setBroadcast(true);
 
-            strAux = command + ",";
+            strAux = v.command + ",";
 
-            /*  Se command = 2, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download 
-                Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */
-            if (command.equals("1")) {
-                sendingRequestFromOption1();
-                waitingResponseFromOption1();
-            } else if (command.equals("2")) {
-                sendingRequestFromOption2();
-                waitingResponseFromOption2();
-            } else if (command.equals("3")) {
-                sendingRequestFromOption3();
-                waitingResponseFromOption3();
-            } else if (command.equals("4")) {
-                sendingRequestFromOption4();
-                waitingResponseFromOption4();
+            /*  Se command = 2, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download
+            Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */ 
+            switch (v.command) {
+                case 1:
+                    sendingRequestFromOption1();
+                    waitingResponseFromOption1();
+                    break;
+                case 2:
+                    sendingRequestFromOption2();
+                    waitingResponseFromOption2();
+                    break;
+                case 3:
+                    sendingRequestFromOption3();
+                    waitingResponseFromOption3();
+                    break;
+                case 4:
+                    sendingRequestFromOption4();
+                    waitingResponseFromOption4();
+                    break;
+                default:
+                    break;
             }
 
             closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
-            textError.add(e.getMessage());
+            v.textError.add(e.getMessage());
             closeConnection();
         }
 
@@ -83,15 +72,15 @@ public class ClientUDP implements Runnable {
             if (recvSocket != null) {
                 recvSocket.close();
             }
-            textAreaClient.add("Disconnected");
+            v.textAreaClient.add("Disconnected");
         } catch (Exception e) {
-            textError.add(e.getMessage());
+            v.textError.add(e.getMessage());
         }
 
     }
 
     private void numberOfFileFoundCount() {
-        switch (listFiles.getItemCount()) {
+        switch (v.listFiles.getItemCount()) {
             case 0:
                 JOptionPane.showMessageDialog(null, "No file found.", "Message", JOptionPane.INFORMATION_MESSAGE);
                 break;
@@ -99,13 +88,13 @@ public class ClientUDP implements Runnable {
                 JOptionPane.showMessageDialog(null, "1 file found.", "Message", JOptionPane.INFORMATION_MESSAGE);
                 break;
             default:
-                JOptionPane.showMessageDialog(null, listFiles.getItemCount() + " files found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, v.listFiles.getItemCount() + " files found.", "Message", JOptionPane.INFORMATION_MESSAGE);
                 break;
         }
     }
 
     private void numberOfIpFoundCount() {
-        switch (listFiles.getItemCount()) {
+        switch (v.listFiles.getItemCount()) {
             case 0:
                 JOptionPane.showMessageDialog(null, "No IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
                 break;
@@ -113,7 +102,7 @@ public class ClientUDP implements Runnable {
                 JOptionPane.showMessageDialog(null, "1 IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
                 break;
             default:
-                JOptionPane.showMessageDialog(null, listFiles.getItemCount() + " IP's found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, v.listFiles.getItemCount() + " IP's found.", "Message", JOptionPane.INFORMATION_MESSAGE);
                 break;
         }
     }
@@ -121,13 +110,13 @@ public class ClientUDP implements Runnable {
     private String[] getSelectedFile() {
         String[] separated;
 
-        if (listFiles.getItemCount() == 0) {
+        if (v.listFiles.getItemCount() == 0) {
             return null;
         }
 
-        for (int i = 0; i < listFiles.getItemCount(); i++) {
-            if (listFiles.isIndexSelected(i)) {
-                separated = listFiles.getItem(i).split(" ");
+        for (int i = 0; i < v.listFiles.getItemCount(); i++) {
+            if (v.listFiles.isIndexSelected(i)) {
+                separated = v.listFiles.getItem(i).split(" ");
                 return separated;
             }
         }
@@ -136,17 +125,17 @@ public class ClientUDP implements Runnable {
 
     private void sendingRequestFromOption1() throws UnknownHostException, IOException {
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
+        v.textAreaClient.add(">>> Request sent to " + v.broadcastIP + " broadcast.");
     }
 
     private void sendingRequestFromOption2() throws UnknownHostException, IOException {
         System.out.println("strAux: " + strAux);
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
+        v.textAreaClient.add(">>> Request sent to " + v.broadcastIP + " broadcast.");
     }
 
     private void sendingRequestFromOption3() throws UnknownHostException, IOException {
@@ -154,18 +143,18 @@ public class ClientUDP implements Runnable {
         strAux += aux[1];
         System.out.println("strAux += aux[1]: " + strAux);
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
+        v.textAreaClient.add(">>> Request sent to " + v.broadcastIP + " broadcast.");
     }
 
     private void sendingRequestFromOption4() throws UnknownHostException, IOException {
-        strAux += askedFile;
+        strAux += v.askedFile;
         System.out.println("strAux += aux[1]: " + strAux);
         byte[] sendData = strAux.getBytes();
-        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(broadcastIP), 5555);
+        sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), 5555);
         sendSocket.send(sendPacket);
-        textAreaClient.add(">>> Request sent to " + broadcastIP + " broadcast.");
+        v.textAreaClient.add(">>> Request sent to " + v.broadcastIP + " broadcast.");
     }
 
     private void waitingResponseFromOption1() {
@@ -193,14 +182,14 @@ public class ClientUDP implements Runnable {
                 listFiles2.add(recv);
             }
         } catch (SocketTimeoutException ste) {
-            textAreaClient.add(">>> Client Received TimeOut");
+            v.textAreaClient.add(">>> Client Received TimeOut");
             numberOfIpFoundCount();
         } catch (SocketException se) {
             se.printStackTrace();
-            textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
+            v.textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
+            v.textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
 
     }
@@ -233,16 +222,16 @@ public class ClientUDP implements Runnable {
                 for (int i = 1; i < split.length; i++) {
                     listFiles2.add(host + " " + split[i]);
                 }
-                textAreaClient.add("Received File List from " + host);
+                v.textAreaClient.add("Received File List from " + host);
 
             }
         } catch (SocketTimeoutException ste) {
-            textAreaClient.add(">>> Client Received TimeOut");
+            v.textAreaClient.add(">>> Client Received TimeOut");
             numberOfFileFoundCount();
         } catch (SocketException se) {
-            textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
+            v.textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
         } catch (IOException ioe) {
-            textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
+            v.textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
 
     }
@@ -252,7 +241,7 @@ public class ClientUDP implements Runnable {
         String ipAddress = selectedFile[0];
         String nameFile = selectedFile[1];
 
-        ClientTCP clientTCP = new ClientTCP(textAreaClient, textError, path, nameFile, ipAddress);
+        ClientTCP clientTCP = new ClientTCP(v.textAreaClient, v.textError, v.destFolder, nameFile, ipAddress);
         Thread threadClientTCP = new Thread(clientTCP);
         threadClientTCP.start();
     }
@@ -270,7 +259,7 @@ public class ClientUDP implements Runnable {
             String recv = "";
             String host = "";
 
-            listFiles.removeAll();
+            v.listFiles.removeAll();
             while (true) {
                 byte[] recvData = new byte[1024];
                 recvPacket = new DatagramPacket(recvData, recvData.length);
@@ -282,22 +271,22 @@ public class ClientUDP implements Runnable {
                 host = split[0];
 
                 for (int i = 1; i < split.length; i++) {
-                    if (split[i].equals(askedFile)) {
-                        listFiles.add(host + " " + split[i]);
+                    if (split[i].equals(v.askedFile)) {
+                        v.listFiles.add(host + " " + split[i]);
                     }
                 }
-                textAreaClient.add("Received File List from " + host);
+                v.textAreaClient.add("Received File List from " + host);
 
             }
         } catch (SocketTimeoutException ste) {
-            textAreaClient.add(">>> Client Received TimeOut");
+            v.textAreaClient.add(">>> Client Received TimeOut");
             numberOfFileFoundCount();
         } catch (SocketException se) {
             se.printStackTrace();
-            textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
+            v.textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
+            v.textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
 
     }

@@ -9,12 +9,7 @@ import java.net.UnknownHostException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import redes.trab.packet.Packet;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class MainView extends javax.swing.JFrame {
 
     //public static String ipAddress = tfIP.getText();
@@ -52,6 +47,10 @@ public class MainView extends javax.swing.JFrame {
         miClear1 = new javax.swing.JMenuItem();
         pmClear2 = new javax.swing.JPopupMenu();
         miClear2 = new javax.swing.JMenuItem();
+        jDialog1 = new javax.swing.JDialog();
+        tfPortUDPsend = new javax.swing.JTextField();
+        tfPortUDPrecv = new javax.swing.JTextField();
+        tfPortTCP = new javax.swing.JTextField();
         listFiles = new java.awt.List();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
@@ -95,6 +94,37 @@ public class MainView extends javax.swing.JFrame {
             }
         });
         pmClear2.add(miClear2);
+
+        jDialog1.setMinimumSize(new java.awt.Dimension(300, 300));
+
+        tfPortUDPsend.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        tfPortUDPsend.setText("5555");
+
+        tfPortUDPrecv.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        tfPortUDPrecv.setText("5556");
+
+        tfPortTCP.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        tfPortTCP.setText("4545");
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(tfPortUDPsend)
+            .addComponent(tfPortUDPrecv)
+            .addComponent(tfPortTCP, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog1Layout.createSequentialGroup()
+                .addGap(62, 62, 62)
+                .addComponent(tfPortUDPsend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(55, 55, 55)
+                .addComponent(tfPortUDPrecv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(54, 54, 54)
+                .addComponent(tfPortTCP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(69, Short.MAX_VALUE))
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("P2P");
@@ -359,17 +389,6 @@ public class MainView extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                /*try {
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedLookAndFeelException ex) {
-                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                }*/
                 MainView main = new MainView();
                 main.setVisible(true);
             }
@@ -382,7 +401,8 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton btnChooseFileSrcFolder;
     private javax.swing.JButton btnClient;
     private javax.swing.JButton btnServer;
-    private javax.swing.JComboBox<String> cbCommand;
+    public static javax.swing.JComboBox<String> cbCommand;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -395,23 +415,18 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JPopupMenu pmClear;
     private javax.swing.JPopupMenu pmClear1;
     private javax.swing.JPopupMenu pmClear2;
-    private java.awt.List textArea;
-    private java.awt.List textAreaClient;
-    private java.awt.List textError;
-    private javax.swing.JTextField tfBroadcastIP;
-    private javax.swing.JTextField tfDestFolder;
-    private javax.swing.JTextField tfDownload;
+    public static java.awt.List textArea;
+    public static java.awt.List textAreaClient;
+    public static java.awt.List textError;
+    public static javax.swing.JTextField tfBroadcastIP;
+    public static javax.swing.JTextField tfDestFolder;
+    public static javax.swing.JTextField tfDownload;
     public static javax.swing.JTextField tfIP;
-    private javax.swing.JTextField tfSrcFolder;
+    public static javax.swing.JTextField tfPortTCP;
+    public static javax.swing.JTextField tfPortUDPrecv;
+    public static javax.swing.JTextField tfPortUDPsend;
+    public static javax.swing.JTextField tfSrcFolder;
     // End of variables declaration//GEN-END:variables
-
-    public static String getIpAddress() {
-        return tfIP.getText();
-    }
-    
-    public static java.awt.List listPanel() {
-        return listFiles;
-    }
 
     public void chooseDirectory(String msg, JTextField tf) {
 
@@ -440,13 +455,13 @@ public class MainView extends javax.swing.JFrame {
     }
 
     public void openClientUDP(String command) {
-        myClientUDP = new ClientUDP(textAreaClient, textError, listFiles, command, tfDestFolder.getText(), tfDownload.getText(), tfIP.getText(), tfBroadcastIP.getText());
+        myClientUDP = new ClientUDP();
         Thread threadClientUDP = new Thread(myClientUDP);
         threadClientUDP.start();
     }
 
     public void openServerUDP() {
-        myServerUDP = new ServerUDP(textArea, textError, tfSrcFolder.getText(), tfIP.getText());
+        myServerUDP = new ServerUDP();
         Thread threadServerUDP = new Thread(myServerUDP);
         threadServerUDP.start();
     }

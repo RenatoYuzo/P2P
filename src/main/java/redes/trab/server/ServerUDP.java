@@ -1,6 +1,5 @@
 package redes.trab.server;
 
-import java.awt.List;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -10,42 +9,29 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
+import redes.trab.util.Variables;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class ServerUDP implements Runnable {
 
-    private final List textArea;
-    private final List textError;
-    private final String path;
-    private final String myIP;
     private String command;
     private DatagramPacket recvPacket = null;
     DatagramSocket recvSocket;
     private String fileName;
     private String[] commandSplit;
-
-    public ServerUDP(List textArea, List textError, String path, String myIP) {
-        this.textArea = textArea;
-        this.textError = textError;
-        this.path = path;
-        this.myIP = myIP;
-    }
+    private Variables v = new Variables();
 
     @Override
     public void run() {
         try {
+            v = new Variables();
             //Keep a socket open to listen to all the UDP trafic that is destined for this port
             recvSocket = new DatagramSocket(null);
             recvSocket.setReuseAddress(true);
             recvSocket.setBroadcast(true);
-            recvSocket.bind(new InetSocketAddress(myIP, 5555));
+            recvSocket.bind(new InetSocketAddress(v.myIP, 5555));
 
             while (true) {
-                textArea.add(">>>   Ready to receive broadcast packets!");
+                v.textArea.add(">>>   Ready to receive broadcast packets!");
                 
                 receivedPacket();
 
@@ -62,14 +48,14 @@ public class ServerUDP implements Runnable {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            textError.add(this.getClass().getSimpleName() + ": " + ex.getMessage());
+            v.textError.add(this.getClass().getSimpleName() + ": " + ex.getMessage());
         }
     }
 
     private ArrayList<String> getFiles() {
 
         try {
-            File file = new File(path);
+            File file = new File(v.srcFolder);
             File[] listOfFiles = file.listFiles();
             ArrayList<String> listOfNameFiles = new ArrayList();
 
@@ -81,7 +67,7 @@ public class ServerUDP implements Runnable {
             return listOfNameFiles;
         } catch (Exception e) {
             e.printStackTrace();
-            textError.add("Error: " + e.getMessage());
+            v.textError.add("Error: " + e.getMessage());
         }
         return null;
 
@@ -89,7 +75,7 @@ public class ServerUDP implements Runnable {
 
     private void sendingRespondeFromOption1() throws IOException {
         //String ip = Inet4Address.getLocalHost().getHostAddress();
-        String ip = myIP;
+        String ip = v.myIP;
         
         byte[] sendData = ip.getBytes();
 
@@ -100,7 +86,7 @@ public class ServerUDP implements Runnable {
     private void sendingRespondeFromOption3() throws UnknownHostException {
         System.out.println("Inet4Address.getLocalHost().getHostAddress(): " + Inet4Address.getLocalHost().getHostAddress());
 
-        ServerTCP serverTCP = new ServerTCP(textArea, textError, path, myIP, fileName);
+        ServerTCP serverTCP = new ServerTCP(v.textArea, v.textError, v.srcFolder, v.myIP, "p.fileName");
         Thread threadServerTCP = new Thread(serverTCP);
         threadServerTCP.start();
     }
@@ -109,7 +95,7 @@ public class ServerUDP implements Runnable {
         ArrayList<String> listOfNameFiles = getFiles();
         System.out.println(Inet4Address.getLocalHost().getHostAddress());
         //String msg = Inet4Address.getLocalHost().getHostAddress();
-        String msg = myIP;
+        String msg = v.myIP;
         
         for (int i = 0; i < listOfNameFiles.size(); i++) {
             msg = msg + "," + listOfNameFiles.get(i);
@@ -128,8 +114,8 @@ public class ServerUDP implements Runnable {
         recvSocket.receive(recvPacket);
 
         //Packet received
-        textArea.add(">>>Discovery packet received from: " + recvPacket.getAddress().getHostAddress());
-        textArea.add(">>>Packet received; data: " + new String(recvPacket.getData()));
+        v.textArea.add(">>>Discovery packet received from: " + recvPacket.getAddress().getHostAddress());
+        v.textArea.add(">>>Packet received; data: " + new String(recvPacket.getData()));
 
         command = new String(recvPacket.getData());
         commandSplit = command.split(",");
