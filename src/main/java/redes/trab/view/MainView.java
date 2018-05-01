@@ -1,5 +1,6 @@
 package redes.trab.view;
 
+import java.awt.event.KeyEvent;
 import redes.trab.client.ClientUDP;
 import redes.trab.server.ServerUDP;
 import java.net.Inet4Address;
@@ -51,6 +52,7 @@ public class MainView extends javax.swing.JFrame {
         tfPortUDPsend = new javax.swing.JTextField();
         tfPortUDPrecv = new javax.swing.JTextField();
         tfPortTCP = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         listFiles = new java.awt.List();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
@@ -95,6 +97,7 @@ public class MainView extends javax.swing.JFrame {
         });
         pmClear2.add(miClear2);
 
+        jDialog1.setLocation(new java.awt.Point(800, 300));
         jDialog1.setMinimumSize(new java.awt.Dimension(300, 300));
 
         tfPortUDPsend.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -106,24 +109,34 @@ public class MainView extends javax.swing.JFrame {
         tfPortTCP.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfPortTCP.setText("4545");
 
+        jButton1.setText("OK");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
         jDialog1Layout.setHorizontalGroup(
             jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(tfPortUDPsend)
             .addComponent(tfPortUDPrecv)
-            .addComponent(tfPortTCP, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addComponent(tfPortTCP)
+            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
         jDialog1Layout.setVerticalGroup(
             jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialog1Layout.createSequentialGroup()
-                .addGap(62, 62, 62)
+                .addGap(24, 24, 24)
                 .addComponent(tfPortUDPsend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(55, 55, 55)
+                .addGap(44, 44, 44)
                 .addComponent(tfPortUDPrecv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(54, 54, 54)
+                .addGap(36, 36, 36)
                 .addComponent(tfPortTCP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addGap(36, 36, 36)
+                .addComponent(jButton1)
+                .addContainerGap(103, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -140,6 +153,12 @@ public class MainView extends javax.swing.JFrame {
         btnServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnServerActionPerformed(evt);
+            }
+        });
+
+        tfIP.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tfIPKeyReleased(evt);
             }
         });
 
@@ -380,6 +399,16 @@ public class MainView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_cbCommandActionPerformed
 
+    private void tfIPKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfIPKeyReleased
+        if (evt.getKeyCode() == KeyEvent.VK_F1) {
+            jDialog1.setVisible(true);
+        }
+    }//GEN-LAST:event_tfIPKeyReleased
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        jDialog1.setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -402,6 +431,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton btnClient;
     private javax.swing.JButton btnServer;
     public static javax.swing.JComboBox<String> cbCommand;
+    private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

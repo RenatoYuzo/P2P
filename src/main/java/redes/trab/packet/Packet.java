@@ -4,22 +4,22 @@ import java.util.ArrayList;
 
 public class Packet {
 
-    private String ipAddress;
+    private String myIP;
     private Integer command;
     private String fileName;
     private ArrayList<String> listOfFiles;
 
-    public Packet(String ip, Integer c) {
-        this.ipAddress = ip;
-        this.command = c;
+    public Packet(String myIP, Integer command) {
+        this.myIP = myIP;
+        this.command = command;
     }
 
-    public String getIpAddress() {        
-        return ipAddress;
+    public String getMyIP() {        
+        return myIP;
     }
 
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
+    public void setMyIP(String myIP) {
+        this.myIP = myIP;
     }
 
     public Integer getCommand() {
@@ -48,7 +48,8 @@ public class Packet {
 
     @Override
     public String toString() {
-        return "Packet [ipAddress=" + ipAddress + ", command=" + command + ", fileName=" + fileName + ", listOfFiles="
+        return "Packet [myIP=" + myIP + ", command=" + command + 
+                ", fileName=" + fileName + ", listOfFiles="
                 + listOfFiles + "]";
     }
 }

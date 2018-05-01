@@ -1,5 +1,6 @@
 package redes.trab.server;
 
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -9,15 +10,15 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import redes.trab.packet.Packet;
 import redes.trab.util.Variables;
 
 public class ServerUDP implements Runnable {
 
-    private String command;
     private DatagramPacket recvPacket = null;
-    DatagramSocket recvSocket;
-    private String fileName;
-    private String[] commandSplit;
+    private DatagramSocket recvSocket;
+    private Packet p;
+    private Gson json;
     private Variables v = new Variables();
 
     @Override
@@ -28,21 +29,28 @@ public class ServerUDP implements Runnable {
             recvSocket = new DatagramSocket(null);
             recvSocket.setReuseAddress(true);
             recvSocket.setBroadcast(true);
-            recvSocket.bind(new InetSocketAddress(v.myIP, 5555));
+            recvSocket.bind(new InetSocketAddress(v.myIP, v.portUDPsend));
 
             while (true) {
                 v.textArea.add(">>>   Ready to receive broadcast packets!");
-                
+
                 receivedPacket();
 
-                if (commandSplit[0].equals("1")) {
-                    sendingRespondeFromOption1();
-                } else if (commandSplit[0].equals("2")) {
-                    sendingResponseFromOption2and4();
-                } else if (commandSplit[0].equals("3")) {
-                    sendingRespondeFromOption3();
-                } else if (commandSplit[0].equals("4")) {
-                    sendingResponseFromOption2and4();
+                switch (p.getCommand()) {
+                    case 1:
+                        sendingRespondeFromOption1();
+                        break;
+                    case 2:
+                        sendingResponseFromOption2();
+                        break;
+                    case 3:
+                        sendingRespondeFromOption3();
+                        break;
+                    case 4:
+                        sendingResponseFromOption4();
+                        break;
+                    default:
+                        break;
                 }
 
             }
@@ -73,26 +81,52 @@ public class ServerUDP implements Runnable {
 
     }
 
+    private ArrayList<String> getFiles(String fileName) {
+
+        try {
+            File file = new File(v.srcFolder);
+            File[] listOfFiles = file.listFiles();
+            ArrayList<String> listOfNameFiles = new ArrayList();
+
+            for (File listOfFile : listOfFiles) {
+                if (listOfFile.isFile()) {
+                    if (listOfFile.getName().equals(fileName)) {
+                        listOfNameFiles.add(listOfFile.getName());
+                    }
+                }
+            }
+            return listOfNameFiles;
+        } catch (Exception e) {
+            e.printStackTrace();
+            v.textError.add("Error: " + e.getMessage());
+        }
+        return null;
+
+    }
+
     private void sendingRespondeFromOption1() throws IOException {
         //String ip = Inet4Address.getLocalHost().getHostAddress();
-        String ip = v.myIP;
+        /*String ip = v.myIP;
         
         byte[] sendData = ip.getBytes();
 
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), 5556);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
+        recvSocket.send(sendPacket);*/
+
+        p = new Packet(v.myIP, 1);
+        json = new Gson();
+        String msg = json.toJson(p);
+
+        System.out.println("JSON enviado pelo Server: " + msg);
+
+        byte[] sendData = msg.getBytes();
+
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
         recvSocket.send(sendPacket);
     }
 
-    private void sendingRespondeFromOption3() throws UnknownHostException {
-        System.out.println("Inet4Address.getLocalHost().getHostAddress(): " + Inet4Address.getLocalHost().getHostAddress());
-
-        ServerTCP serverTCP = new ServerTCP(v.textArea, v.textError, v.srcFolder, v.myIP, "p.fileName");
-        Thread threadServerTCP = new Thread(serverTCP);
-        threadServerTCP.start();
-    }
-
-    private void sendingResponseFromOption2and4() throws IOException {
-        ArrayList<String> listOfNameFiles = getFiles();
+    private void sendingResponseFromOption2() throws IOException {
+        /*ArrayList<String> listOfNameFiles = getFiles();
         System.out.println(Inet4Address.getLocalHost().getHostAddress());
         //String msg = Inet4Address.getLocalHost().getHostAddress();
         String msg = v.myIP;
@@ -104,12 +138,81 @@ public class ServerUDP implements Runnable {
         System.out.println("Enviado: " + msg);
         byte[] sendData = msg.getBytes();
 
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), 5556);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
+        recvSocket.send(sendPacket);*/
+
+        p = new Packet(v.myIP, 2);
+        p.setListOfFiles(getFiles());
+
+        json = new Gson();
+        String msg = json.toJson(p);
+        System.out.println("JSON enviado pelo Server: " + msg);
+        byte[] sendData = msg.getBytes();
+
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
+        recvSocket.send(sendPacket);
+
+    }
+
+    private void sendingRespondeFromOption3() throws UnknownHostException {
+        System.out.println("Inet4Address.getLocalHost().getHostAddress(): " + Inet4Address.getLocalHost().getHostAddress());
+
+        ServerTCP serverTCP = new ServerTCP(v.textArea, v.textError, v.srcFolder, v.myIP, "p.fileName");
+        Thread threadServerTCP = new Thread(serverTCP);
+        threadServerTCP.start();
+    }
+
+    private void sendingResponseFromOption4() throws IOException {
+        /*ArrayList<String> listOfNameFiles = getFiles();
+        System.out.println(Inet4Address.getLocalHost().getHostAddress());
+        //String msg = Inet4Address.getLocalHost().getHostAddress();
+        String msg = v.myIP;
+        
+        for (int i = 0; i < listOfNameFiles.size(); i++) {
+            msg = msg + "," + listOfNameFiles.get(i);
+        }
+
+        System.out.println("Enviado: " + msg);
+        byte[] sendData = msg.getBytes();
+
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
+        recvSocket.send(sendPacket);*/
+
+        ArrayList<String> listOfNameFiles = getFiles(p.getFileName());
+
+        if (listOfNameFiles.size() > 0) {
+            p = new Packet(v.myIP, 4);
+            p.setListOfFiles(listOfNameFiles);
+            
+            json = new Gson();
+            String msg = json.toJson(p);
+            System.out.println("JSON enviado pelo Server: " + msg);
+            byte[] sendData = msg.getBytes();
+
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
+            recvSocket.send(sendPacket);
+        }
+    }
+
+    private void sendingResponseFromOption2and4() throws IOException {
+        ArrayList<String> listOfNameFiles = getFiles();
+        System.out.println(Inet4Address.getLocalHost().getHostAddress());
+        //String msg = Inet4Address.getLocalHost().getHostAddress();
+        String msg = v.myIP;
+
+        for (int i = 0; i < listOfNameFiles.size(); i++) {
+            msg = msg + "," + listOfNameFiles.get(i);
+        }
+
+        System.out.println("Enviado: " + msg);
+        byte[] sendData = msg.getBytes();
+
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
         recvSocket.send(sendPacket);
     }
 
     private void receivedPacket() throws IOException {
-        byte[] recvData = new byte[1024];
+        /*byte[] recvData = new byte[1024];
         recvPacket = new DatagramPacket(recvData, recvData.length);
         recvSocket.receive(recvPacket);
 
@@ -121,7 +224,21 @@ public class ServerUDP implements Runnable {
         commandSplit = command.split(",");
         fileName = commandSplit[1];
         fileName = fileName.trim();
-        System.out.println("fileName: " + fileName);
+        System.out.println("fileName: " + fileName);*/
+        
+        byte[] recvData = new byte[1024];
+        recvPacket = new DatagramPacket(recvData, recvData.length);
+        recvSocket.receive(recvPacket);
+        
+        String msg = new String(recvPacket.getData()).trim();
+        System.out.println("JSON foi recebido pelo Server: " + msg);
+        
+        json = new Gson();
+        p = json.fromJson(msg, Packet.class);
+        
+        //Packet received
+        v.textArea.add(">>>Discovery packet received from: " + p.getMyIP());
+        v.textArea.add(">>>Packet received; data: " + msg);
     }
 
 }
