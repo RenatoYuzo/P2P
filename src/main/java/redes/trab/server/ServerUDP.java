@@ -105,14 +105,6 @@ public class ServerUDP implements Runnable {
     }
 
     private void sendingRespondeFromOption1() throws IOException {
-        //String ip = Inet4Address.getLocalHost().getHostAddress();
-        /*String ip = v.myIP;
-        
-        byte[] sendData = ip.getBytes();
-
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
-        recvSocket.send(sendPacket);*/
-
         p = new Packet(v.myIP, 1);
         json = new Gson();
         String msg = json.toJson(p);
@@ -126,21 +118,6 @@ public class ServerUDP implements Runnable {
     }
 
     private void sendingResponseFromOption2() throws IOException {
-        /*ArrayList<String> listOfNameFiles = getFiles();
-        System.out.println(Inet4Address.getLocalHost().getHostAddress());
-        //String msg = Inet4Address.getLocalHost().getHostAddress();
-        String msg = v.myIP;
-        
-        for (int i = 0; i < listOfNameFiles.size(); i++) {
-            msg = msg + "," + listOfNameFiles.get(i);
-        }
-
-        System.out.println("Enviado: " + msg);
-        byte[] sendData = msg.getBytes();
-
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
-        recvSocket.send(sendPacket);*/
-
         p = new Packet(v.myIP, 2);
         p.setListOfFiles(getFiles());
 
@@ -155,29 +132,12 @@ public class ServerUDP implements Runnable {
     }
 
     private void sendingRespondeFromOption3() throws UnknownHostException {
-        System.out.println("Inet4Address.getLocalHost().getHostAddress(): " + Inet4Address.getLocalHost().getHostAddress());
-
-        ServerTCP serverTCP = new ServerTCP(v.textArea, v.textError, v.srcFolder, v.myIP, "p.fileName");
+        ServerTCP serverTCP = new ServerTCP(p.getFileName());
         Thread threadServerTCP = new Thread(serverTCP);
         threadServerTCP.start();
     }
 
     private void sendingResponseFromOption4() throws IOException {
-        /*ArrayList<String> listOfNameFiles = getFiles();
-        System.out.println(Inet4Address.getLocalHost().getHostAddress());
-        //String msg = Inet4Address.getLocalHost().getHostAddress();
-        String msg = v.myIP;
-        
-        for (int i = 0; i < listOfNameFiles.size(); i++) {
-            msg = msg + "," + listOfNameFiles.get(i);
-        }
-
-        System.out.println("Enviado: " + msg);
-        byte[] sendData = msg.getBytes();
-
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
-        recvSocket.send(sendPacket);*/
-
         ArrayList<String> listOfNameFiles = getFiles(p.getFileName());
 
         if (listOfNameFiles.size() > 0) {
@@ -194,38 +154,7 @@ public class ServerUDP implements Runnable {
         }
     }
 
-    private void sendingResponseFromOption2and4() throws IOException {
-        ArrayList<String> listOfNameFiles = getFiles();
-        System.out.println(Inet4Address.getLocalHost().getHostAddress());
-        //String msg = Inet4Address.getLocalHost().getHostAddress();
-        String msg = v.myIP;
-
-        for (int i = 0; i < listOfNameFiles.size(); i++) {
-            msg = msg + "," + listOfNameFiles.get(i);
-        }
-
-        System.out.println("Enviado: " + msg);
-        byte[] sendData = msg.getBytes();
-
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(recvPacket.getAddress().getHostAddress()), v.portUDPrecv);
-        recvSocket.send(sendPacket);
-    }
-
     private void receivedPacket() throws IOException {
-        /*byte[] recvData = new byte[1024];
-        recvPacket = new DatagramPacket(recvData, recvData.length);
-        recvSocket.receive(recvPacket);
-
-        //Packet received
-        v.textArea.add(">>>Discovery packet received from: " + recvPacket.getAddress().getHostAddress());
-        v.textArea.add(">>>Packet received; data: " + new String(recvPacket.getData()));
-
-        command = new String(recvPacket.getData());
-        commandSplit = command.split(",");
-        fileName = commandSplit[1];
-        fileName = fileName.trim();
-        System.out.println("fileName: " + fileName);*/
-        
         byte[] recvData = new byte[1024];
         recvPacket = new DatagramPacket(recvData, recvData.length);
         recvSocket.receive(recvPacket);

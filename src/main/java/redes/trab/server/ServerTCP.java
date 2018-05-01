@@ -1,6 +1,5 @@
 package redes.trab.server;
 
-import java.awt.List;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -12,18 +11,10 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import redes.trab.util.Variables;
 
-/**
- *
- * @author RenatoYuzo
- */
 public class ServerTCP implements Runnable {
 
-    private final String path;
-    private final String ipAddress;
-    private final int port = 4545;
-    private final List textArea;
-    private final List textError;
     private final String fileName;
     private PrintWriter out;
     private BufferedReader in;
@@ -31,12 +22,9 @@ public class ServerTCP implements Runnable {
     private BufferedOutputStream outByte;
     private ServerSocket serverSocket;
     private Socket client;
+    private Variables v = new Variables();
 
-    public ServerTCP(List textArea, List textError, String path, String ipAddress, String fileName) {
-        this.textArea = textArea;
-        this.textError = textError;
-        this.path = path;
-        this.ipAddress = ipAddress;
+    public ServerTCP(String fileName) {
         this.fileName = fileName;
     }
 
@@ -46,10 +34,10 @@ public class ServerTCP implements Runnable {
             // Abrindo um socket no ip e na porta fornecidos pelo ServerUDP
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
-            serverSocket.bind(new InetSocketAddress(ipAddress, port));
+            serverSocket.bind(new InetSocketAddress(v.myIP, v.portTCP));
             serverSocket.setSoTimeout(5000);
-            System.out.println("Server IpAddress: " + serverSocket.getInetAddress().getHostAddress());
-            System.out.println("Server port: " + serverSocket.getLocalPort());
+            System.out.println("Server IpAddress: " + v.myIP);
+            System.out.println("Server port: " + v.portTCP);
 
             // Esperando por uma conexao com algum ClientTCP
             System.out.println("Server criado, esperando conexão.");
@@ -71,8 +59,8 @@ public class ServerTCP implements Runnable {
     }
 
     private void sendingFileToClientTCP() throws IOException {
-        File file = new File(path + "\\" + fileName);
-        System.out.println(path + "\\" + fileName);
+        File file = new File(v.srcFolder + "\\" + fileName);
+        System.out.println(v.srcFolder + "\\" + fileName);
         outByte = new BufferedOutputStream(client.getOutputStream());
 
         if (!file.exists()) {
@@ -96,7 +84,7 @@ public class ServerTCP implements Runnable {
                 serverSocket.close();
             }
             if (client != null) {
-                textArea.add("Client " + client.getPort() + " has disconnected");
+                v.textArea.add("Client " + client.getPort() + " has disconnected");
                 client.close();
             }
             if (out != null) {
@@ -112,7 +100,7 @@ public class ServerTCP implements Runnable {
                 outByte.close();
             }
         } catch (IOException e) {
-            textError.add("Error: " + e.getMessage());
+            v.textError.add("Error: " + e.getMessage());
         }
     }
 
