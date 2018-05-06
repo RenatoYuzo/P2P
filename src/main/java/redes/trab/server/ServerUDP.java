@@ -1,16 +1,15 @@
 package redes.trab.server;
 
 import com.google.gson.Gson;
-import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import redes.trab.packet.Packet;
+import redes.trab.util.Util;
 import redes.trab.util.Variables;
 
 public class ServerUDP implements Runnable {
@@ -60,50 +59,6 @@ public class ServerUDP implements Runnable {
         }
     }
 
-    private ArrayList<String> getFiles() {
-
-        try {
-            File file = new File(v.srcFolder);
-            File[] listOfFiles = file.listFiles();
-            ArrayList<String> listOfNameFiles = new ArrayList();
-
-            for (File listOfFile : listOfFiles) {
-                if (listOfFile.isFile()) {
-                    listOfNameFiles.add(listOfFile.getName());
-                }
-            }
-            return listOfNameFiles;
-        } catch (Exception e) {
-            e.printStackTrace();
-            v.textError.add("Error: " + e.getMessage());
-        }
-        return null;
-
-    }
-
-    private ArrayList<String> getFiles(String fileName) {
-
-        try {
-            File file = new File(v.srcFolder);
-            File[] listOfFiles = file.listFiles();
-            ArrayList<String> listOfNameFiles = new ArrayList();
-
-            for (File listOfFile : listOfFiles) {
-                if (listOfFile.isFile()) {
-                    if (listOfFile.getName().equals(fileName)) {
-                        listOfNameFiles.add(listOfFile.getName());
-                    }
-                }
-            }
-            return listOfNameFiles;
-        } catch (Exception e) {
-            e.printStackTrace();
-            v.textError.add("Error: " + e.getMessage());
-        }
-        return null;
-
-    }
-
     private void sendingRespondeFromOption1() throws IOException {
         p = new Packet(v.myIP, 1);
         json = new Gson();
@@ -119,7 +74,7 @@ public class ServerUDP implements Runnable {
 
     private void sendingResponseFromOption2() throws IOException {
         p = new Packet(v.myIP, 2);
-        p.setListOfFiles(getFiles());
+        p.setListOfFiles(Util.getFiles(v.srcFolder, v.textError));
 
         json = new Gson();
         String msg = json.toJson(p);
@@ -138,12 +93,12 @@ public class ServerUDP implements Runnable {
     }
 
     private void sendingResponseFromOption4() throws IOException {
-        ArrayList<String> listOfNameFiles = getFiles(p.getFileName());
+        ArrayList<String> listOfNameFiles = Util.getFiles(v.srcFolder, v.textError, p.getFileName());
 
         if (listOfNameFiles.size() > 0) {
             p = new Packet(v.myIP, 4);
             p.setListOfFiles(listOfNameFiles);
-            
+
             json = new Gson();
             String msg = json.toJson(p);
             System.out.println("JSON enviado pelo Server: " + msg);
@@ -158,13 +113,13 @@ public class ServerUDP implements Runnable {
         byte[] recvData = new byte[1024];
         recvPacket = new DatagramPacket(recvData, recvData.length);
         recvSocket.receive(recvPacket);
-        
+
         String msg = new String(recvPacket.getData()).trim();
         System.out.println("JSON foi recebido pelo Server: " + msg);
-        
+
         json = new Gson();
         p = json.fromJson(msg, Packet.class);
-        
+
         //Packet received
         v.textArea.add(">>>Discovery packet received from: " + p.getMyIP());
         v.textArea.add(">>>Packet received; data: " + msg);

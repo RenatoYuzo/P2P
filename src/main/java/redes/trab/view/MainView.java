@@ -3,17 +3,13 @@ package redes.trab.view;
 import java.awt.event.KeyEvent;
 import redes.trab.client.ClientUDP;
 import redes.trab.server.ServerUDP;
-import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+import redes.trab.util.Util;
 
 public class MainView extends javax.swing.JFrame {
 
-    //public static String ipAddress = tfIP.getText();
     ServerSocket serverSocket;
     Socket client;
     ClientUDP myClientUDP;
@@ -25,12 +21,8 @@ public class MainView extends javax.swing.JFrame {
      */
     public MainView() {
         initComponents();
-        try {
-            tfIP.setText(Inet4Address.getLocalHost().getHostAddress());
-            jToolBar1.setVisible(false);
-        } catch (UnknownHostException ex) {
-            textError.add(ex.getMessage());
-        }
+        //tfIP.setText(Inet4Address.getLocalHost().getHostAddress());
+        jToolBar1.setVisible(false);
     }
 
     /**
@@ -53,6 +45,9 @@ public class MainView extends javax.swing.JFrame {
         tfPortUDPrecv = new javax.swing.JTextField();
         tfPortTCP = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        cbReuseAddress = new javax.swing.JCheckBox();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
         listFiles = new java.awt.List();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
@@ -98,7 +93,7 @@ public class MainView extends javax.swing.JFrame {
         pmClear2.add(miClear2);
 
         jDialog1.setLocation(new java.awt.Point(800, 300));
-        jDialog1.setMinimumSize(new java.awt.Dimension(300, 300));
+        jDialog1.setMinimumSize(new java.awt.Dimension(400, 400));
 
         tfPortUDPsend.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfPortUDPsend.setText("5555");
@@ -116,6 +111,14 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
+        cbReuseAddress.setText("Reuse Address");
+
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setText("jTextField1");
+
+        jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField2.setText("jTextField2");
+
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
         jDialog1Layout.setHorizontalGroup(
@@ -123,7 +126,13 @@ public class MainView extends javax.swing.JFrame {
             .addComponent(tfPortUDPsend)
             .addComponent(tfPortUDPrecv)
             .addComponent(tfPortTCP)
-            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jTextField1)
+            .addGroup(jDialog1Layout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(cbReuseAddress)
+                .addContainerGap(253, Short.MAX_VALUE))
+            .addComponent(jTextField2)
         );
         jDialog1Layout.setVerticalGroup(
             jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -134,9 +143,15 @@ public class MainView extends javax.swing.JFrame {
                 .addComponent(tfPortUDPrecv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addComponent(tfPortTCP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
+                .addGap(37, 37, 37)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35)
+                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cbReuseAddress)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
-                .addContainerGap(103, Short.MAX_VALUE))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -162,7 +177,7 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        tfBroadcastIP.setText("192.168.0.255");
+        tfBroadcastIP.setText("255.255.255.255");
 
         jLabel1.setText("IP Address:");
 
@@ -313,46 +328,75 @@ public class MainView extends javax.swing.JFrame {
 
     private void btnClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientActionPerformed
 
-        String command = Integer.toString(cbCommand.getSelectedIndex() + 1);
+        int command = cbCommand.getSelectedIndex() + 1;
 
-        if (command.equals("1")) {
-            openClientUDP(command);
-        } else if (command.equals("2")) {
-            openClientUDP(command);
-        } else if (command.equals("3")) {
-            fileName = getSelectedFile();
-            if (fileName != null) {
-                openClientUDP(command);
-            } else if (listFiles.getItemCount() == 0) {
-                JOptionPane.showMessageDialog(null, "First, you need to request available files (Option 2). Or ask for one (Option 4)", "Empty list of files", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Select one file to download", "No file selected.", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else if (command.equals("4")) {
-            if (tfDownload.getText().equals("")) {
-                JOptionPane.showMessageDialog(null, "Type the file's name that you want to download.", "Type the file's name", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                openClientUDP(command);
+        if (tfBroadcastIP.getText().equals("")) {
+            tfBroadcastIP.setBackground(new java.awt.Color(255, 204, 204));
+            JOptionPane.showMessageDialog(null, "Type IP Broadcast.", "IP Broadcast", JOptionPane.INFORMATION_MESSAGE);
+        } else if (tfDestFolder.getText().equals("")) {
+            tfDestFolder.setBackground(new java.awt.Color(255, 204, 204));
+            JOptionPane.showMessageDialog(null, "Choose directory that you want to save downloaded files.", "Destination Directory", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            tfBroadcastIP.setBackground(new java.awt.Color(255, 255, 255));
+            tfDestFolder.setBackground(new java.awt.Color(255, 255, 255));
+            switch (command) {
+                case 1:
+                    openClientUDP();
+                    break;
+                case 2:
+                    openClientUDP();
+                    break;
+                case 3:
+                    fileName = Util.getSelectedFile(listFiles)[1];
+                    if (fileName != null) {
+                        boolean existFile = Util.checkIfIHaveFile(fileName, tfDestFolder.getText());
+                        if (existFile == false) {
+                            openClientUDP();
+                        }
+                    } else if (listFiles.getItemCount() == 0) {
+                        JOptionPane.showMessageDialog(null, "First, you need to request available files (Option 2). Or ask for one (Option 4)", "Empty list of files", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Select one file to download", "No file selected.", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    break;
+                case 4:
+                    if (tfDownload.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null, "Type the file's name that you want to download.", "Type the file's name", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        openClientUDP();
+                    }
+                    break;
+                default:
+                    break;
             }
         }
-
     }//GEN-LAST:event_btnClientActionPerformed
 
     private void btnServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServerActionPerformed
-        tfIP.setEnabled(false);
-        tfBroadcastIP.setEnabled(false);
-        tfSrcFolder.setEnabled(false);
-        btnChooseFileSrcFolder.setEnabled(false);
-        openServerUDP();
+        if (tfIP.getText().equals("")) {
+            tfIP.setBackground(new java.awt.Color(255, 204, 204));
+            JOptionPane.showMessageDialog(null, "Type your machine IP.", "IP", JOptionPane.INFORMATION_MESSAGE);
+        } else if (tfSrcFolder.getText().equals("")) {
+            tfSrcFolder.setBackground(new java.awt.Color(255, 204, 204));
+            JOptionPane.showMessageDialog(null, "Choose your source directory to share files.", "Source Directory", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            tfIP.setBackground(new java.awt.Color(255, 255, 255));
+            tfSrcFolder.setBackground(new java.awt.Color(255, 255, 255));
+            tfIP.setEnabled(false);
+            tfBroadcastIP.setEnabled(false);
+            tfSrcFolder.setEnabled(false);
+            btnChooseFileSrcFolder.setEnabled(false);
+            openServerUDP();
+        }
     }//GEN-LAST:event_btnServerActionPerformed
 
     private void btnChooseFileSrcFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileSrcFolderActionPerformed
-        chooseDirectory("Choose Server source folder", tfSrcFolder);
+        Util.chooseDirectory("Choose Server source folder", tfSrcFolder);
 
     }//GEN-LAST:event_btnChooseFileSrcFolderActionPerformed
 
     private void btnChooseFileDestFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileDestFolderActionPerformed
-        chooseDirectory("Choose Client destination folder", tfDestFolder);
+        Util.chooseDirectory("Choose Client destination folder", tfDestFolder);
     }//GEN-LAST:event_btnChooseFileDestFolderActionPerformed
 
     private void miClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miClearActionPerformed
@@ -431,12 +475,15 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton btnClient;
     private javax.swing.JButton btnServer;
     public static javax.swing.JComboBox<String> cbCommand;
+    private javax.swing.JCheckBox cbReuseAddress;
     private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     private javax.swing.JToolBar jToolBar1;
     public static java.awt.List listFiles;
     private javax.swing.JMenuItem miClear;
@@ -458,33 +505,7 @@ public class MainView extends javax.swing.JFrame {
     public static javax.swing.JTextField tfSrcFolder;
     // End of variables declaration//GEN-END:variables
 
-    public void chooseDirectory(String msg, JTextField tf) {
-
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new java.io.File("."));
-        fileChooser.setDialogTitle(msg);
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            tf.setText(fileChooser.getSelectedFile().getPath());
-        }
-
-    }
-
-    public String getSelectedFile() {
-        String[] separated;
-
-        for (int i = 0; i < listFiles.getItemCount(); i++) {
-            if (listFiles.isIndexSelected(i)) {
-                separated = listFiles.getItem(i).split(" ");
-                return separated[1];
-            }
-        }
-        return null;
-    }
-
-    public void openClientUDP(String command) {
+    public void openClientUDP() {
         myClientUDP = new ClientUDP();
         Thread threadClientUDP = new Thread(myClientUDP);
         threadClientUDP.start();

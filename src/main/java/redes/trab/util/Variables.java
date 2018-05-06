@@ -4,6 +4,7 @@ import java.awt.List;
 import redes.trab.view.MainView;
 
 public class Variables {
+
     public List textArea;
     public List textAreaClient;
     public List textError;
@@ -18,7 +19,7 @@ public class Variables {
     public Integer portUDPsend;
     public Integer portUDPrecv;
     public Integer portTCP;
-    
+
     public Variables() {
         this.textArea = MainView.textArea;
         this.textAreaClient = MainView.textAreaClient;
@@ -28,8 +29,8 @@ public class Variables {
         this.destFolder = MainView.tfDestFolder.getText();
         this.askedFile = MainView.tfDownload.getText();
         this.myIP = MainView.tfIP.getText();
-        this.srcFolder = MainView.tfSrcFolder.getText();        
-        this.command = MainView.cbCommand.getSelectedIndex()+1;
+        this.srcFolder = MainView.tfSrcFolder.getText();
+        this.command = MainView.cbCommand.getSelectedIndex() + 1;
         this.portUDPsend = Integer.parseInt(MainView.tfPortUDPsend.getText());
         this.portUDPrecv = Integer.parseInt(MainView.tfPortUDPrecv.getText());
         this.portTCP = Integer.parseInt(MainView.tfPortTCP.getText());
@@ -37,11 +38,10 @@ public class Variables {
 
     @Override
     public String toString() {
-        return "Variables[broadcastIP=" + broadcastIP + " | destFolder=" + destFolder + 
-                " | askedFile=" + askedFile + " | myIP=" + myIP + " | srcFolder=" + srcFolder + 
-                " | command=" + command + " | portUDPsend:" + portUDPsend +
-                " | portUDPrecv:" + portUDPrecv + " | portTCP:" + portTCP +']';
+        return "Variables[broadcastIP=" + broadcastIP + " | destFolder=" + destFolder
+                + " | askedFile=" + askedFile + " | myIP=" + myIP + " | srcFolder=" + srcFolder
+                + " | command=" + command + " | portUDPsend:" + portUDPsend
+                + " | portUDPrecv:" + portUDPrecv + " | portTCP:" + portTCP + ']';
     }
-    
-    
+
 }

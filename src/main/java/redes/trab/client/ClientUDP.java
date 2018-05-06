@@ -11,8 +11,8 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import javax.swing.JOptionPane;
 import redes.trab.packet.Packet;
+import redes.trab.util.Util;
 import redes.trab.util.Variables;
-import redes.trab.view.MainView;
 
 public class ClientUDP implements Runnable {
 
@@ -33,7 +33,7 @@ public class ClientUDP implements Runnable {
             sendSocket.setBroadcast(true);
 
             /*  Se command = 2, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download
-            Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */ 
+            Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */
             switch (v.command) {
                 case 1:
                     sendingRequestFromOption1();
@@ -107,30 +107,14 @@ public class ClientUDP implements Runnable {
                 break;
         }
     }
-
-    private String[] getSelectedFile() {
-        String[] separated;
-
-        if (v.listFiles.getItemCount() == 0) {
-            return null;
-        }
-
-        for (int i = 0; i < v.listFiles.getItemCount(); i++) {
-            if (v.listFiles.isIndexSelected(i)) {
-                separated = v.listFiles.getItem(i).split(" ");
-                return separated;
-            }
-        }
-        return null;
-    }
-
+    
     private void sendingRequestFromOption1() throws UnknownHostException, IOException {
         p = new Packet(v.myIP, 1);
         json = new Gson();
-        String msg = json.toJson(p);    
-        
+        String msg = json.toJson(p);
+
         System.out.println("JSON enviado pelo Client: " + msg);
-        
+
         byte[] sendData = msg.getBytes();
         sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), v.portUDPsend);
         sendSocket.send(sendPacket);
@@ -140,9 +124,9 @@ public class ClientUDP implements Runnable {
     private void sendingRequestFromOption2() throws UnknownHostException, IOException {
         p = new Packet(v.myIP, 2);
         json = new Gson();
-        String msg = json.toJson(p);        
+        String msg = json.toJson(p);
         System.out.println("JSON enviado pelo Client: " + msg);
-        
+
         byte[] sendData = msg.getBytes();
         sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), v.portUDPsend);
         sendSocket.send(sendPacket);
@@ -151,11 +135,11 @@ public class ClientUDP implements Runnable {
 
     private void sendingRequestFromOption3() throws UnknownHostException, IOException {
         p = new Packet(v.myIP, 3);
-        p.setFileName(getSelectedFile()[1]);
+        p.setFileName(Util.getSelectedFile(v.listFiles)[1]);
         json = new Gson();
-        String msg = json.toJson(p);        
+        String msg = json.toJson(p);
         System.out.println("JSON enviado pelo Client: " + msg);
-        
+
         byte[] sendData = msg.getBytes();
         sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), v.portUDPsend);
         sendSocket.send(sendPacket);
@@ -166,9 +150,9 @@ public class ClientUDP implements Runnable {
         p = new Packet(v.myIP, 4);
         p.setFileName(v.askedFile);
         json = new Gson();
-        String msg = json.toJson(p);        
+        String msg = json.toJson(p);
         System.out.println("JSON enviado pelo Client: " + msg);
-        
+
         byte[] sendData = msg.getBytes();
         sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName(v.broadcastIP), v.portUDPsend);
         sendSocket.send(sendPacket);
@@ -183,20 +167,20 @@ public class ClientUDP implements Runnable {
             recvSocket.bind(address);
             recvSocket.setBroadcast(true);
             recvSocket.setSoTimeout(2000);
-            
+
             v.listFiles.removeAll();
             while (true) {
                 byte[] recvData = new byte[1024];
                 recvPacket = new DatagramPacket(recvData, recvData.length);
                 recvSocket.receive(recvPacket);
-                
+
                 String msg = new String(recvPacket.getData()).trim();
                 System.out.println("JSON foi recebido pelo Client: " + msg);
-                    
+
                 p = json.fromJson(msg, Packet.class);
-                
+
                 v.listFiles.add(p.getMyIP());
-                
+
                 v.textAreaClient.add("Received File List from " + p.getMyIP());
             }
         } catch (SocketTimeoutException ste) {
@@ -221,20 +205,20 @@ public class ClientUDP implements Runnable {
             recvSocket.bind(address);
             recvSocket.setBroadcast(true);
             recvSocket.setSoTimeout(2000);
-            
+
             v.listFiles.removeAll();
             while (true) {
                 byte[] recvData = new byte[1024];
                 recvPacket = new DatagramPacket(recvData, recvData.length);
                 recvSocket.receive(recvPacket);
-                
+
                 String msg = new String(recvPacket.getData()).trim();
                 System.out.println("JSON foi recebido pelo Client: " + msg);
-                    
+
                 p = json.fromJson(msg, Packet.class);
-                
-                for (int i=0; i<p.getListOfFiles().size(); i++) {
-                    v.listFiles.add(p.getMyIP() + " " + p.getListOfFiles().get(i));
+
+                for (int i = 0; i < p.getListOfFiles().size(); i++) {
+                    v.listFiles.add(p.getMyIP() + ":" + p.getListOfFiles().get(i));
                 }
                 v.textAreaClient.add("Received File List from " + p.getMyIP());
             }
@@ -242,15 +226,17 @@ public class ClientUDP implements Runnable {
             v.textAreaClient.add(">>> Client Received TimeOut");
             numberOfFileFoundCount();
         } catch (SocketException se) {
+            se.printStackTrace();
             v.textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
         } catch (IOException ioe) {
+            ioe.printStackTrace();
             v.textError.add(this.getClass().getSimpleName() + ": " + ioe.getMessage());
         }
 
     }
 
     private void waitingResponseFromOption3() {
-        String[] selectedFile = getSelectedFile();
+        String[] selectedFile = Util.getSelectedFile(v.listFiles);
         String ipAddress = selectedFile[0];
         String nameFile = selectedFile[1];
 
