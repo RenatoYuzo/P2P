@@ -1,3 +1,7 @@
+/** ************************************************************************
+ * Esta classe representa a Interface Grafica do programa, implementando
+ * os metodos necessarios para o funcionamento de cada componente grafico
+ ************************************************************************* */
 package redes.trab.view;
 
 import java.awt.event.KeyEvent;
@@ -14,15 +18,17 @@ public class MainView extends javax.swing.JFrame {
     Socket client;
     ClientUDP myClientUDP;
     ServerUDP myServerUDP;
-    String fileName;
 
     /**
      * Creates new form MainView
      */
     public MainView() {
         initComponents();
-        //tfIP.setText(Inet4Address.getLocalHost().getHostAddress());
         jToolBar1.setVisible(false);
+        
+        /*tfIP.setText("192.168.0.17");
+        tfSrcFolder.setText("D:\\Desktop\\Shared Files");
+        tfDestFolder.setText("D:\\Desktop\\Received Files from Server");*/
     }
 
     /**
@@ -45,9 +51,9 @@ public class MainView extends javax.swing.JFrame {
         tfPortUDPrecv = new javax.swing.JTextField();
         tfPortTCP = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
-        cbReuseAddress = new javax.swing.JCheckBox();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         listFiles = new java.awt.List();
         btnServer = new javax.swing.JButton();
         tfIP = new javax.swing.JTextField();
@@ -93,7 +99,7 @@ public class MainView extends javax.swing.JFrame {
         pmClear2.add(miClear2);
 
         jDialog1.setLocation(new java.awt.Point(800, 300));
-        jDialog1.setMinimumSize(new java.awt.Dimension(400, 400));
+        jDialog1.setMinimumSize(new java.awt.Dimension(400, 300));
 
         tfPortUDPsend.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfPortUDPsend.setText("5555");
@@ -111,13 +117,17 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        cbReuseAddress.setText("Reuse Address");
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("Port UDP Sender");
 
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField1.setText("jTextField1");
+        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setText("Port UDP Receiver");
 
-        jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField2.setText("jTextField2");
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("Port TCP");
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
@@ -126,32 +136,29 @@ public class MainView extends javax.swing.JFrame {
             .addComponent(tfPortUDPsend)
             .addComponent(tfPortUDPrecv)
             .addComponent(tfPortTCP)
-            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jTextField1)
-            .addGroup(jDialog1Layout.createSequentialGroup()
-                .addGap(50, 50, 50)
-                .addComponent(cbReuseAddress)
-                .addContainerGap(253, Short.MAX_VALUE))
-            .addComponent(jTextField2)
+            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jDialog1Layout.setVerticalGroup(
             jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialog1Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tfPortUDPsend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(44, 44, 44)
+                .addGap(24, 24, 24)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tfPortUDPrecv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
+                .addGap(16, 16, 16)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tfPortTCP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cbReuseAddress)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jButton1)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap(88, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -213,13 +220,9 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
-        tfSrcFolder.setText("D:\\Desktop\\Shared Files");
-
         jLabel3.setText("Source Folder:");
 
         jLabel4.setText("Dest. Folder:");
-
-        tfDestFolder.setText("D:\\Desktop\\Received Files from Server");
 
         btnChooseFileSrcFolder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/file_icon.png"))); // NOI18N
         btnChooseFileSrcFolder.addActionListener(new java.awt.event.ActionListener() {
@@ -336,6 +339,9 @@ public class MainView extends javax.swing.JFrame {
         } else if (tfDestFolder.getText().equals("")) {
             tfDestFolder.setBackground(new java.awt.Color(255, 204, 204));
             JOptionPane.showMessageDialog(null, "Choose directory that you want to save downloaded files.", "Destination Directory", JOptionPane.INFORMATION_MESSAGE);
+        } else if (!Util.verifyDirectory(tfDestFolder.getText())) {
+            tfDestFolder.setBackground(new java.awt.Color(255, 204, 204));
+            JOptionPane.showMessageDialog(null, "Invalid path for Dest folder, choose another path.", "Destination Directory", JOptionPane.INFORMATION_MESSAGE);
         } else {
             tfBroadcastIP.setBackground(new java.awt.Color(255, 255, 255));
             tfDestFolder.setBackground(new java.awt.Color(255, 255, 255));
@@ -347,9 +353,9 @@ public class MainView extends javax.swing.JFrame {
                     openClientUDP();
                     break;
                 case 3:
-                    fileName = Util.getSelectedFile(listFiles)[1];
+                    String[] fileName = Util.getSelectedFile(listFiles);
                     if (fileName != null) {
-                        boolean existFile = Util.checkIfIHaveFile(fileName, tfDestFolder.getText());
+                        boolean existFile = Util.checkIfIHaveFile(fileName[1], tfDestFolder.getText());
                         if (existFile == false) {
                             openClientUDP();
                         }
@@ -379,6 +385,9 @@ public class MainView extends javax.swing.JFrame {
         } else if (tfSrcFolder.getText().equals("")) {
             tfSrcFolder.setBackground(new java.awt.Color(255, 204, 204));
             JOptionPane.showMessageDialog(null, "Choose your source directory to share files.", "Source Directory", JOptionPane.INFORMATION_MESSAGE);
+        } else if (!Util.verifyDirectory(tfSrcFolder.getText())) {
+            tfSrcFolder.setBackground(new java.awt.Color(255, 204, 204));
+            JOptionPane.showMessageDialog(null, "Invalid path for Source folder, choose another path.", "Source Directory", JOptionPane.INFORMATION_MESSAGE);
         } else {
             tfIP.setBackground(new java.awt.Color(255, 255, 255));
             tfSrcFolder.setBackground(new java.awt.Color(255, 255, 255));
@@ -475,15 +484,15 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton btnClient;
     private javax.swing.JButton btnServer;
     public static javax.swing.JComboBox<String> cbCommand;
-    private javax.swing.JCheckBox cbReuseAddress;
     private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JToolBar jToolBar1;
     public static java.awt.List listFiles;
     private javax.swing.JMenuItem miClear;

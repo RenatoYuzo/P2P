@@ -1,3 +1,8 @@
+/**************************************************************************
+ * Esta classe implementa um Cliente para conexao TCP para troca de
+ * arquivos entre o Cliente e o Servidor 
+ **************************************************************************/
+
 package redes.trab.client;
 
 import java.io.BufferedInputStream;
@@ -34,12 +39,14 @@ public class ClientTCP implements Runnable {
     @Override
     public void run() {
         try {
-            // Abrindo um socket no ip e na porta fornecidos pelo ClientUDP
+            
             System.out.println("Client IpAddress: " + ipAddress);
             System.out.println("Client port: " + v.portTCP);
             socket = new Socket();
             socket.setReuseAddress(true);
-            //socket.bind(new InetSocketAddress(ipAddress, port));
+            
+            // Conecta o ClientTCP no ip e porta para receber pacotes de um especifico ServerTCP
+            // ClientTCP espera por 6 segundos pela conexao com o especifico ServerTCP
             socket.connect(new InetSocketAddress(ipAddress, v.portTCP), 6000);
             System.out.println("Client Conectado!");
 
@@ -51,11 +58,11 @@ public class ClientTCP implements Runnable {
             input = new BufferedInputStream(socket.getInputStream());
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            //out1.println(fileName);
             // Recebe um Byte (0 ou 1) do ServerTCP, 0 se arquivo nao existe, 1 se arquivo existe
             int code = input.read();
             System.out.println("code: " + code);
 
+            // Entrara em um While, recebendo partes do arquivo com 1024 bytes
             if (code == 1) {
                 outputFile = new BufferedOutputStream(new FileOutputStream(v.destFolder + "\\" + fileName));
                 byte[] buffer = new byte[1024];

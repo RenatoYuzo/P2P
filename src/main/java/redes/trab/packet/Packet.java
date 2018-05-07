@@ -1,3 +1,7 @@
+/**************************************************************************
+ * Esta classe funciona como um esqueleto para a mensagem que sera enviada
+ **************************************************************************/
+
 package redes.trab.packet;
 
 import java.util.ArrayList;

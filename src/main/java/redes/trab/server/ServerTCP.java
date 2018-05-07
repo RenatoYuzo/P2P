@@ -1,3 +1,8 @@
+/**************************************************************************
+ * Esta classe implementa um Servidor para conexao TCP, enviando seu
+ * arquivo para o Cliente que requisitou
+ **************************************************************************/
+
 package redes.trab.server;
 
 import java.io.BufferedInputStream;
@@ -35,6 +40,8 @@ public class ServerTCP implements Runnable {
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(v.myIP, v.portTCP));
+            
+            // Server espera uma conexao por 5 segundos ate dar um TimeOut
             serverSocket.setSoTimeout(5000);
             System.out.println("Server IpAddress: " + v.myIP);
             System.out.println("Server port: " + v.portTCP);
@@ -48,7 +55,7 @@ public class ServerTCP implements Runnable {
             out = new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            //fileName = in.readLine();
+            // Envia o arquivo que o Client pediu, se estiver disponivel
             sendingFileToClientTCP();
             closeConnection();
 

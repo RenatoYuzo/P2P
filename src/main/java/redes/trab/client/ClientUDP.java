@@ -1,3 +1,7 @@
+/** ************************************************************************
+ * Esta classe implementa um Cliente para conexao UDP, enviando um pacote
+ * que contem uma mensagem que sera lida e interpretada pelo Servidor
+ ************************************************************************* */
 package redes.trab.client;
 
 import com.google.gson.Gson;
@@ -13,6 +17,7 @@ import javax.swing.JOptionPane;
 import redes.trab.packet.Packet;
 import redes.trab.util.Util;
 import redes.trab.util.Variables;
+import redes.trab.view.MainView;
 
 public class ClientUDP implements Runnable {
 
@@ -32,8 +37,11 @@ public class ClientUDP implements Runnable {
             sendSocket = new DatagramSocket();
             sendSocket.setBroadcast(true);
 
-            /*  Se command = 2, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download
-            Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do devido arquivo */
+            /*  Se command = 1, ClientUDP faz uma busca de todos os IP's da rede
+                Se command = 2, ClientUDP deseja perguntar aos ServersUDP quais sao o seus arquivos disponiveis para download 
+                Se command = 3, ClientUDP deseja solicitar ao ServerUDP o download do arquivo selecionado
+                Se command = 4, ClientUDP pergunta para todos os ServersUDP, se eles tem o arquivo digitado 
+                Logo apos uma requisicao ao servidor, o Cliente ficara em modo de espera por respostas */
             switch (v.command) {
                 case 1:
                     sendingRequestFromOption1();
@@ -80,35 +88,7 @@ public class ClientUDP implements Runnable {
 
     }
 
-    private void numberOfFileFoundCount() {
-        switch (v.listFiles.getItemCount()) {
-            case 0:
-                JOptionPane.showMessageDialog(null, "No file found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 1:
-                JOptionPane.showMessageDialog(null, "1 file found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            default:
-                JOptionPane.showMessageDialog(null, v.listFiles.getItemCount() + " files found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                break;
-        }
-    }
-
-    private void numberOfIpFoundCount() {
-        switch (v.listFiles.getItemCount()) {
-            case 0:
-                JOptionPane.showMessageDialog(null, "No IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 1:
-                JOptionPane.showMessageDialog(null, "1 IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            default:
-                JOptionPane.showMessageDialog(null, v.listFiles.getItemCount() + " IP's found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                break;
-        }
-    }
-    
-    private void sendingRequestFromOption1() throws UnknownHostException, IOException {
+    private void sendingRequestFromOption1() throws UnknownHostException, IOException {        
         p = new Packet(v.myIP, 1);
         json = new Gson();
         String msg = json.toJson(p);
@@ -185,7 +165,7 @@ public class ClientUDP implements Runnable {
             }
         } catch (SocketTimeoutException ste) {
             v.textAreaClient.add(">>> Client Received TimeOut");
-            numberOfIpFoundCount();
+            Util.numberOfFileFoundCount(v.listFiles);
         } catch (SocketException se) {
             se.printStackTrace();
             v.textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());
@@ -224,7 +204,7 @@ public class ClientUDP implements Runnable {
             }
         } catch (SocketTimeoutException ste) {
             v.textAreaClient.add(">>> Client Received TimeOut");
-            numberOfFileFoundCount();
+            Util.numberOfFileFoundCount(v.listFiles);
         } catch (SocketException se) {
             se.printStackTrace();
             v.textError.add(this.getClass().getSimpleName() + ": " + se.getMessage());

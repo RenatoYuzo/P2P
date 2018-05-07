@@ -1,3 +1,8 @@
+/**************************************************************************
+ * Esta classe implementa alguns metodos uteis que serao utilizados pelas
+ * outras classes do programa
+ **************************************************************************/
+
 package redes.trab.util;
 
 import java.io.File;
@@ -21,23 +26,17 @@ public abstract class Util {
         }
 
     }
-
-    /*public static String getSelectedFile(java.awt.List listFiles) {
-        String[] separated;
-
-        for (int i = 0; i < listFiles.getItemCount(); i++) {
-            if (listFiles.isIndexSelected(i)) {
-                separated = listFiles.getItem(i).split(":");
-                return separated[1];
-            }
-        }
-        return null;
-    }*/
+    
+    public static boolean verifyDirectory(String path) {
+        File folder = new File(path);
+        return folder.exists();
+    }
+    
     public static ArrayList<String> getFiles(String srcFolder, java.awt.List textError) {
 
         try {
-            File file = new File(srcFolder);
-            File[] listOfFiles = file.listFiles();
+            File folder = new File(srcFolder);
+            File[] listOfFiles = folder.listFiles();
             ArrayList<String> listOfNameFiles = new ArrayList();
 
             for (File listOfFile : listOfFiles) {
@@ -57,8 +56,8 @@ public abstract class Util {
     public static ArrayList<String> getFiles(String srcFolder, java.awt.List textError, String fileName) {
 
         try {
-            File file = new File(srcFolder);
-            File[] listOfFiles = file.listFiles();
+            File folder = new File(srcFolder);
+            File[] listOfFiles = folder.listFiles();
             ArrayList<String> listOfNameFiles = new ArrayList();
 
             for (File listOfFile : listOfFiles) {
@@ -91,6 +90,34 @@ public abstract class Util {
             }
         }
         return null;
+    }
+    
+    public static void numberOfFileFoundCount(java.awt.List listFiles) {
+        switch (listFiles.getItemCount()) {
+            case 0:
+                JOptionPane.showMessageDialog(null, "No file found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "1 file found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, listFiles.getItemCount() + " files found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+        }
+    }
+
+    public static void numberOfIpFoundCount(java.awt.List listFiles) {
+        switch (listFiles.getItemCount()) {
+            case 0:
+                JOptionPane.showMessageDialog(null, "No IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "1 IP found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, listFiles.getItemCount() + " IP's found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                break;
+        }
     }
 
     public static boolean checkIfIHaveFile(String fileName, String destFolder) {

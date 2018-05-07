@@ -1,6 +1,13 @@
+/**************************************************************************
+ * Esta classe serve para deixar organizado todas as variaveis utilizadas
+ * na interface grafica, desse modo, ficando mais facil das outras classes
+ * acessa-las
+ **************************************************************************/
+
 package redes.trab.util;
 
 import java.awt.List;
+import javax.swing.JDialog;
 import redes.trab.view.MainView;
 
 public class Variables {

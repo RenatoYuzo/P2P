@@ -1,3 +1,9 @@
+/**************************************************************************
+ * Esta classe implementa um Servidor para conexao UDP, recebendo pacotes
+ * enviados para a sua porta. E envia uma resposta para quem fez 
+ * a requisicao
+ **************************************************************************/
+
 package redes.trab.server;
 
 import com.google.gson.Gson;
@@ -24,7 +30,7 @@ public class ServerUDP implements Runnable {
     public void run() {
         try {
             v = new Variables();
-            //Keep a socket open to listen to all the UDP trafic that is destined for this port
+            
             recvSocket = new DatagramSocket(null);
             recvSocket.setReuseAddress(true);
             recvSocket.setBroadcast(true);
@@ -32,9 +38,14 @@ public class ServerUDP implements Runnable {
 
             while (true) {
                 v.textArea.add(">>>   Ready to receive broadcast packets!");
-
+                
+                //O ServerUDP recebera um pacote no padrao JSON
                 receivedPacket();
-
+                
+                /* Ao desempacotar a mensagem e transforma-la em um objeto pacote p
+                 podera ler o comando que o Cliente requisitou (1,2,3 ou 4)
+                 Para cada comando solicitado pelo Cliente, o Servidor fornecera
+                 sua devida resposta */
                 switch (p.getCommand()) {
                     case 1:
                         sendingRespondeFromOption1();
@@ -120,7 +131,6 @@ public class ServerUDP implements Runnable {
         json = new Gson();
         p = json.fromJson(msg, Packet.class);
 
-        //Packet received
         v.textArea.add(">>>Discovery packet received from: " + p.getMyIP());
         v.textArea.add(">>>Packet received; data: " + msg);
     }
